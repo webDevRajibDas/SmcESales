@@ -1,0 +1,145 @@
+
+<style>
+.search .btn {
+    margin-top: 0px;
+}
+</style>
+
+
+<div class="row">
+
+    <div class="col-xs-12">	
+    	
+		<div class="box box-primary">
+			
+            <div class="box-header">
+				<h3 class="box-title"><i class="glyphicon glyphicon-eye-open"></i> <?php  echo __('SO on Map'); ?></h3>
+				<div class="box-tools pull-right">
+	                <?php echo $this->Html->link(__('<i class="glyphicon glyphicon-th-large"></i> Map Tracking'), array('action' => 'view'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+				</div>
+			</div>
+            
+            <?php if(!$office_parent_id){ ?>			
+			<div class="box-body">
+                <div class="search-box">
+					<?php echo $this->Form->create('MapSalesTrack', array('role' => 'form', 'action'=>'index')); ?>
+					<table class="search">
+						<tr>
+                        	
+                        	<td class="required"><?php echo $this->Form->input('office_id', array('id' => 'office_id','class' => 'form-control office_id','required'=>true,'empty'=>'---- Select office ----','options'=>$offices)); ?></td>
+                           
+                            
+							<?php /*?><td width="30%"><?php echo $this->Form->input('so_id', array('id' => 'so_id','class' => 'form-control so_id', 'required'=>true,'empty'=>'---- Select SO ----', 'options'=>$so_user_dropdown)); ?></td><?php */?>
+
+							<?php /*?><td class="required"><?php echo $this->Form->input('date', array('class' => 'form-control datepicker', 'required'=>true)); ?></td><?php */?>
+						
+							<td>
+								<?php echo $this->Form->button('<i class="fa fa-search"></i> Search', array('type' => 'submit','class' => 'btn btn-large btn-primary','escape' => false)); ?>
+								<?php echo $this->Html->link(__('<i class="fa fa-refresh"></i> Reset'), array('action' => ''), array('class' => 'btn btn-warning', 'escape' => false)); ?>
+							</td>
+						</tr>
+					</table>
+					<?php echo $this->Form->end(); ?>
+				</div>
+            </div>
+            <?php } ?>
+            
+
+
+            <?php if($loaction){ ?>
+                <div class="box-body" style="padding-top:0px; height:600px;">    
+                    
+                    <style>
+                    #map_canvas { margin: 0; padding: 0; height: 100% }
+                    </style>
+                    
+                    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBrqyZeXLzrIP2M2-t-xMUKzFyDz6FupXw&sensor=false"></script>
+                    
+                    <div id="map_canvas"></div>
+        			
+                    <script type="text/javascript">
+					var locations = [
+					  <?=$loaction?>
+					];
+				
+					var map = new google.maps.Map(document.getElementById('map_canvas'), {
+					  zoom: 9,
+					  center: new google.maps.LatLng(<?=$latitude?>, <?=$longitude?>),
+					  mapTypeId: google.maps.MapTypeId.ROADMAP
+					});
+				
+					var infowindow = new google.maps.InfoWindow();
+				
+					var marker, i;
+					
+					//Cumtom Image Location
+					//var image = new google.maps.MarkerImage('images/beachflag.png');
+					/*var image = new google.maps.MarkerImage('images/beachflag.png',
+					// This marker is 20 pixels wide by 32 pixels tall.
+					new google.maps.Size(20, 32),
+					// The origin for this image is 0,0.
+					new google.maps.Point(0,0),
+					// The anchor for this image is the base of the flagpole at 0,32.
+					new google.maps.Point(0, 32));*/
+					
+					//var image = new google.maps.MarkerImage('images/beachflag.png');
+					
+					
+					color = 'blue'; 
+				
+					for (i = 0; i < locations.length; i++) {  
+					  marker = new google.maps.Marker({
+						position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+						map: map,
+						//icon: image //For Cumtom Image
+						//icon: 'http://maps.google.com/mapfiles/ms/icons/'+color+'.png',
+						//url: locations[i][4]
+					  });
+					  
+					  
+				
+					  google.maps.event.addListener(marker, 'click', (function(marker, i) {
+						return function() {
+						  infowindow.setContent(locations[i][0]);
+						  infowindow.open(map, marker);
+						  //window.location.href = this.url;
+				
+						}
+					  })(marker, i));
+					}
+				  </script>
+                    
+                    
+                </div>
+            <?php }else{ ?>
+            	<div class="box-body" style="height:600px; text-align:center;">  
+           			<h3>No data found!</h3>
+                </div>
+            <?php } ?>
+            
+           
+            				
+		</div>
+            			
+	</div>
+
+
+</div><!-- /#page-container .row-fluid -->
+
+
+<script>
+$(document).ready(function(){
+	/*$('#office_id').selectChain({
+		target: $('#so_id'),
+		value:'name',
+		url: '<?= BASE_URL.'map_sales_tracks/get_so_list_by_office'?>',
+		type: 'post',
+		data:{'office_id': 'office_id' }
+	});*/
+});
+</script>
+
+
+<?php
+//exit;
+?>

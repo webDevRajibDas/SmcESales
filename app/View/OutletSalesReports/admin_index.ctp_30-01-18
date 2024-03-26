@@ -1,0 +1,372 @@
+<?php
+App::import('Controller', 'OutletSalesReportsController');
+$EsalesController = new OutletSalesReportsController;
+?>
+
+
+<style>
+.search .radio label {
+    width: auto;
+	float:none;
+	padding-left:5px;
+}
+.search .radio legend {
+    float: left;
+    margin: 5px 20px 0 0;
+    text-align: right;
+    width: 30%;
+	display: inline-block;
+    font-weight: 700;
+	font-size:14px;
+	border-bottom:none;
+}
+#market_list .checkbox label{
+	padding-left:10px;
+	width:auto;
+}
+#market_list .checkbox{
+	width:30%;
+	float:left;
+	margin:1px 0;
+}
+body .td_rank_list .checkbox{
+	width:auto !important;
+	padding-left:20px !important;
+}
+/*.td_rank_list #rank_list label{
+	clear:right;
+	width:50% !important;
+}*/
+.so_list .checkbox {
+    width: 50% !important;
+    float: left;
+    margin: 1px 0;
+}
+</style>
+
+
+<div class="row">
+    <div class="col-xs-12">
+		<div class="box box-primary">
+        
+        
+        
+			<div class="box-header">
+				<h3 class="box-title"><i class="glyphicon glyphicon-th-large"></i> <?php echo __('Outlet Sales Summary Report'); ?></h3>
+				<?php /*?><div class="box-tools pull-right">
+					<?php if($this->App->menu_permission('nationalSalesReports', 'admin_add')){ echo $this->Html->link(__('<i class="glyphicon glyphicon-plus"></i> New Esales Setting'), array('action' => 'add'), array('class' => 'btn btn-primary', 'escape' => false)); } ?>
+				</div><?php */?>
+			</div>
+            
+            	
+			<div class="box-body">
+				
+                <div class="search-box">
+					<?php echo $this->Form->create('OutletSalesReports', array('role' => 'form', 'action'=>'index')); ?>
+					<table class="search">
+                    	 
+                        
+                         <tr>
+							<td class="required" width="50%"><?php echo $this->Form->input('office_id', array('label' => 'Area Office :', 'id' => 'office_id','class' => 'form-control office_id','required'=>true,'empty'=>'---- Select ----')); ?></td>
+							<td></td>							
+						</tr>
+                        					     
+                        <tr>
+							<td colspan="2">
+                            <label style="float:left; width:15%;">Sales Officers : </label>
+                            <div id="market_list" class="input select so_list" style="float:left; width:80%; padding-left:20px;">
+							<?php echo $this->Form->input('so_id', array('label'=>false, 'class' => 'checkbox', 'multiple' => 'checkbox', 'options' => $so_list)); ?>
+                            </div>
+                            </td>
+						</tr>
+                        
+                        
+                        <tr>
+							<td colspan="2">
+                            <label style="float:left; width:15%;">Outlet Category : </label>
+                            <div id="market_list" class="input select" style="float:left; width:80%; padding-left:20px;">
+							<?php echo $this->Form->input('outlet_category_id', array('id' => 'outlet_category_id', 'label'=>false, 'class' => 'checkbox', 'multiple' => 'checkbox', 'options' => $outlet_categories)); ?>
+                            </div>
+                            </td>
+						</tr>
+                                                
+                        
+                        <tr>
+							<td class="required" width="50%">
+							<?php echo $this->Form->input('date_from', array('class' => 'form-control datepicker','required' => true)); ?>
+                            </td>
+                            
+                            <td class="required" width="50%">
+							<?php echo $this->Form->input('date_to', array('class' => 'form-control datepicker','required' => true)); ?>
+                            </td>	
+						</tr>
+                        
+                        
+						
+						<tr align="center">
+							<td colspan="2">
+                            
+								<?php echo $this->Form->submit('Submit', array('type' => 'submit', 'class' => 'btn btn-large btn-primary', 'escape' => false, 'div'=>false, 'name'=>'submit')); ?>
+                                
+                                                              
+								<?php echo $this->Html->link(__('<i class="fa fa-refresh"></i> Reset'), array('action' => ''), array('class' => 'btn btn-warning', 'escape' => false)); ?>
+                                
+                                <?php if(!empty($requested_data)){ ?>
+                                <a onclick="PrintElem('content')" class="btn btn-primary"><i class="fa fa-print"></i> Print</a>
+                                <?php } ?>
+                                
+							</td>						
+						</tr>
+					</table>
+                    	
+                    
+					<?php echo $this->Form->end(); ?>
+				</div>
+                
+                
+                <script>
+				//$(input[type='checkbox']).iCheck(false); 
+				$(document).ready(function() {
+					$("input[type='checkbox']").iCheck('destroy');
+				});
+				</script>
+                
+                
+                
+                <?php if(!empty($requested_data)){ ?>
+                
+                 
+                 
+                 <div id="content" style="width:90%; margin:0 5%;">
+                 
+                    <style type="text/css">
+					.table-responsive { color: #333; font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; line-height: 1.42857; }
+					.report_table{ font-size:12px; }
+					.qty_val{ width:125px; margin:0; float:left; text-transform:capitalize;}
+					.val{ border-right:none; }
+					p{ margin:2px 0px; }
+					.bottom_box{ float:left; width:33.3%; text-align:center; }
+					td, th {padding: 5px;}
+					table { border-collapse: collapse; border-spacing: 0; }
+					.titlerow, .totalColumn{ background:#f1f1f1; }
+					.report_table {margin-bottom: 18px; max-width: 100%; width: 100%;}
+					.table-responsive {min-height: 0.01%;overflow-x: auto;}
+					</style>
+                    
+                    
+            		<div class="table-responsive">
+                    
+                        
+                        <div style="float:left; width:100%; text-align:center; padding:20px 0; clear:both;">
+                            <h2 style="margin:2px 0;">Social Marketing Company</h2>
+                            <h3 style="margin:2px 0;">Outlet Type Wise Sales Summary Report</h3>
+                            <p>
+                                Time Frame : <b><?=date('d M, Y', strtotime($date_from))?></b> to <b><?=date('d M, Y', strtotime($date_to))?></b>
+                            </p>
+                        </div>	 
+                         
+                          
+                          
+                            
+                        <div style="float:left; width:100%; text-align:center; padding:10px 0px; margin-top:20px; border:#333 solid 1px; border-bottom:none;">
+                            <h4 style="margin:0px;"><?=$EsalesController->getOfficeName($requested_data['OutletSalesReports']['office_id'])?></h4>
+                        </div>
+                                                    
+                        <table id="sum_table" class="text-center report_table" border="1px solid black" cellpadding="10px" cellspacing="0" align="center">
+                                                      
+                            <tr class="titlerow">
+                                <th>Sales Officer</th>
+                                <th>Outlet Type</th>
+                                <th># Of Eff. Calls</th>
+                                <th># Of Outlet</th>
+                                <th>Product</th>
+                                <th>Qty</th>
+                                <th>Value</th>
+                                <th>Eff. Calls</th>
+                                <th>Eff. Outlet</th>
+                            </tr>
+                          
+                            <?php 
+							$so_array = array();
+							if(empty($requested_data['OutletSalesReports']['so_id'])){	
+								foreach($so_list as $key => $val){array_push($so_array, $key);}
+							}else{
+								$so_array = $requested_data['OutletSalesReports']['so_id'];
+							}
+							
+							//pr($so_array);
+							
+							$outlet_cat_array = array();
+							if(empty($requested_data['OutletSalesReports']['outlet_category_id'])){	
+								foreach($outlet_categories as $key => $val){array_push($outlet_cat_array, $key);}
+							}else{
+								$outlet_cat_array = $requested_data['OutletSalesReports']['outlet_category_id'];
+							}
+							?>
+                            
+                            <?php 
+							$s=1;
+							foreach($so_list as $s_key => $s_val){ 
+							?>
+                                <?php if(in_array($s_key, $so_array)){ ?>
+									
+									<?php 
+									$o=1;
+									foreach($outlet_categories as $o_key => $o_val){ 
+									?>
+                                    
+                                        <?php if(in_array($o_key, $outlet_cat_array)){ ?>
+                                        
+                                        	<?php
+											$p=1; 
+											foreach($product_list as $p_key => $p_val){ 
+											?>
+                                            <tr class="rowDataSd" style="<?php echo ($o==1 && $p==1)?'background:#E0E0E0':''?>">
+                                                <td><?=($o==1 && $p==1)?$s_val:''?></td>
+                                                
+                                                <td><?=($p==1)?$o_val:''?></td>
+                                                
+                                                <td class="qty">
+												<?=($p==1)?$EsalesController->getOutletECTotal($requested_data, $s_key, $o_key):''?>
+                                                </td>
+                                                
+                                                <td class="qty">
+												<?=($p==1)?$EsalesController->getOutletOCTotal($requested_data, $s_key, $o_key):''?>
+                                                </td>
+                                                
+                                                <td><?=$p_val?></td>
+                                                
+                                                <?php
+                                                //$p_result = $EsalesController->getProdcutOCTotal($requested_data, $s_key, $o_key, $p_key);
+												//pr($p_result);
+												//$p_result = array();
+												?>
+                                                <td><?=@$datas[$s_key][$o_key][$p_key]['volume']?$datas[$s_key][$o_key][$p_key]['volume']:0?></td>
+                                                <td><?=@$datas[$s_key][$o_key][$p_key]['value']?$datas[$s_key][$o_key][$p_key]['value']:0?></td>
+                                                <td><?=@$datas[$s_key][$o_key][$p_key]['ec']?$datas[$s_key][$o_key][$p_key]['ec']:0?></td>
+                                                <td><?=@$datas2[$s_key][$o_key][$p_key]['oc']?$datas2[$s_key][$o_key][$p_key]['oc']:0?></td>
+                                                <?php /*?><td><?=$p_result[0][0]['p_qty']?$p_result[0][0]['p_qty']:0?></td>
+                                                <td class="qty"><?=$p_result[0][0]['p_value']?sprintf("%01.2f", $p_result[0][0]['p_value']):0?></td>
+                                                
+                                                <td><?=$p_result[0][0]['total_EC']?></td>
+                                                <td><?=$p_result[0][0]['o_count']?></td><?php */?>
+                                            </tr>
+                                            <?php $p++; } ?>
+                                            
+                                        <?php $o++; } ?>
+                                        
+                                    <?php } ?>
+                            	<?php } ?>
+                             <?php $s++; } ?>
+                            
+                             <tr class="totalColumn" style="font-weight:bold;">
+                                 <td></td>
+                                 <td>Total</td>
+                                 <td class="totalQty"></td>
+                                 <td class="totalQty"></td>
+                                 <td></td>
+                                 <td></td>
+                                 <td class="totalQty"></td>
+                                 <td></td>
+                                 <td></td>
+                             </tr>
+                             
+                      </table>
+                      
+                      
+                      <script>
+						var totals_qty = [0,0,0,0,0,0,0,0,0];
+						$(document).ready(function(){
+				
+							var $dataRows = $("#sum_table tr:not('.totalColumn, .titlerow')");
+				
+							$dataRows.each(function() {
+								$(this).find('.qty').each(function(i){  
+									val = $(this).html()?$(this).html():0;  
+									totals_qty[i]+=parseFloat(val);
+								});
+							});
+							
+							$("#sum_table .totalQty").each(function(i){  
+								$(this).html(totals_qty[i].toFixed(2));
+							});
+				
+						});
+						</script>
+                            
+                       
+                        
+                        
+                        <div style="width:100%; padding:100px 0 50px;">
+                            <div class="bottom_box">
+                                Prepared by:______________ 
+                            </div>
+                            <div class="bottom_box">
+                                Checked by:______________ 
+                            </div>
+                            <div class="bottom_box">
+                                Signed by:______________
+                            </div>		  
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                
+                <?php } ?>
+                
+                								
+			</div>			
+		</div>
+	</div>
+</div>
+
+
+
+
+<script>
+$(document).ready(function(){
+	
+});
+
+
+
+$('#office_id').change(function() {
+	//alert($(this).val());
+  	$.ajax({
+		type: "POST",
+		url: '<?=BASE_URL?>outlet_sales_reports/get_territory_so_list',
+		data: 'office_id='+$(this).val(),
+		cache: false, 
+		success: function(response){
+			//alert(response);						
+			$('.so_list').html(response);				
+		}
+	});
+});
+
+</script>
+
+
+
+<script>
+	function PrintElem(elem)
+	{
+		var mywindow = window.open('', 'PRINT', 'height=400,width=1000');
+
+		//mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+		mywindow.document.write('<html><head><title></title><style>.csv_btn{display:none;}</style>');
+		mywindow.document.write('</head><body>');
+		//mywindow.document.write('<h1>' + document.title  + '</h1>');
+		mywindow.document.write(document.getElementById(elem).innerHTML);
+		mywindow.document.write('</body></html>');
+
+		mywindow.document.close(); // necessary for IE >= 10
+		mywindow.focus(); // necessary for IE >= 10*/
+
+		mywindow.print();
+		//mywindow.close();
+
+		return true;
+	}
+</script>

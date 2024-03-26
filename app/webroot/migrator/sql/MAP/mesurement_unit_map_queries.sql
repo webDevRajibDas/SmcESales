@@ -1,0 +1,14 @@
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(5,30);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(6,45);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(7,43);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(8,33);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(9,32);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(10,34);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(11,36);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(12,37);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(13,38);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(14,40);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(15,41);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(16,44);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(17,46);
+INSERT into unit_measurement_map (esales_measurement_unit_id, dss_unit_id) values(18,29);

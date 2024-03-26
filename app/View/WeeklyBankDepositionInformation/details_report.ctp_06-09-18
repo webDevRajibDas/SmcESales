@@ -1,0 +1,75 @@
+<?php
+ // pr($data);exit;
+?>
+<div style="float:left; width:100%; height:450px; overflow:scroll;">
+<?php if($data){?>
+<a class="btn btn-success pull-right" id="download_xl">Download XL</a>
+<div id="content">
+	<table class="print-table table table-bordered table-responsive table-striped" style="width:100%" border="1px solid black" cellpadding="2px" cellspacing="0">
+		<thead>
+			<tr class="row_data">
+				<td>Terrytory</td>
+				<td>Slip Date</td>
+				<td>Slip No</td>
+				<td>Instrument Type</td>
+				<td>Amount</td>
+				<td>Remarks</td>
+			</tr>
+		</thead>
+		<tbody>
+		<?php foreach($data as $territory=>$rpt_data){ 
+			$i=0;
+			if($rpt_data['total']){
+			?>
+
+			<?php foreach($rpt_data['data'] as $deposit_data){ $i++;?>
+			<tr>
+
+				<?php if($i==1){?><td rowspan="<?=count($rpt_data['data']);?>"><?php  echo $territory;?></td><?php }?> 
+				<td><?=$deposit_data['Deposit']['deposit_date']?></td>
+				<td><?=$deposit_data['Deposit']['slip_no']?></td>
+				<td><?=$deposit_data['Deposit']['type']==2?$instrument_type[$deposit_data['Collection']['instrument_type']]:$instrument_type[$deposit_data['Deposit']['type']]?></td>
+				<td><?=$deposit_data['Deposit']['deposit_amount']?></td>
+				<td><?=$deposit_data['Deposit']['type']==1?($deposit_data['Deposit']['instrument_type']!='' && $deposit_data['Deposit']['instrument_type']!=0?$instrument_type[$deposit_data['Deposit']['instrument_type']]:$instrument_type[$deposit_data['Deposit']['type']]):$deposit_data['Deposit']['remarks']?></td>
+			</tr>
+			
+			<?php }?>
+			<tr>
+				<td>Total</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td><?=$rpt_data['total']?></td>
+				<td></td>
+			</tr>
+
+		<?php }}?>
+		<tr>
+			<td>All Territory Total</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td><?=$all_total?></td>
+				<td></td>
+		</tr>
+		</tbody>
+	</table>
+	</div>
+	<?php }?>
+</div>
+<script type="text/javascript">
+	 $(document).ready(function(){
+            $("#download_xl").click(function(e){
+              e.preventDefault();
+              var html = $("#content").html();
+                            // console.log(html);
+                            var blob = new Blob([html], { type: 'data:application/vnd.ms-excel' }); 
+                            var downloadUrl = URL.createObjectURL(blob);
+                            var a = document.createElement("a");
+                            a.href = downloadUrl;
+                            a.download = "downloadFile.xls";
+                            document.body.appendChild(a);
+                            a.click();
+                          });
+          });
+</script>

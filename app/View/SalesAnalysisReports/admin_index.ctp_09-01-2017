@@ -1,0 +1,626 @@
+<?php
+//App::import('Controller', 'SalesAnalysisReportsController');
+//$SalesAnalysisController = new SalesAnalysisReportsController;
+?>
+
+
+<style>
+.search label {
+    width: 20%;
+}
+.row_list div.list, .input.radio{
+	float:left;
+	width:50%;
+	margin:0px;
+}
+.row_list label{
+	width:auto;
+}
+.row_list input.form-control{
+	width:auto;
+	margin:0 !important;
+}
+.list label, .input.radio label{
+    cursor: pointer;
+    font-weight: 400;
+    margin-bottom: 0;
+    min-height: 20px;
+    padding-left: 16px;
+}	
+.input.radio label{
+	padding-left:28px;
+}
+.search .radio legend {
+    float: left;
+    margin: 5px 20px 0 0;
+    text-align: right;
+    width: 30%;
+	display: inline-block;
+    font-weight: 700;
+	font-size:14px;
+	border-bottom:none;
+}
+#market_list .checkbox label{
+	padding-left:10px;
+	width:auto;
+}
+#market_list .checkbox{
+	width:20%;
+	float:left;
+	margin:1px 0;
+}
+body .td_rank_list .checkbox{
+	width:auto !important;
+	padding-left:20px !important;
+}
+/*.td_rank_list #rank_list label{
+	clear:right;
+	width:50% !important;
+}*/
+.so_list .checkbox {
+    width: 50% !important;
+    float: left;
+    margin: 1px 0;
+}
+.search .date_field .form-control {
+    width: 40%;
+}
+.date_field label{
+	width:40%;
+}
+td{
+	padding:5px;
+}
+td.left{
+	border-right:#c7c7c7 solid 1px;
+}
+.outlet_category{
+	float:right;
+	width:85%;
+	padding-left:10%;
+	border:#c7c7c7 solid 1px;
+	height:100px;
+	overflow:auto;
+	margin-right:5%;
+	padding-top:5px;
+}
+
+.outlet_category2{
+	padding-left:3%;
+	height:118px;
+}
+.outlet_category3{
+	width:92%;
+	margin-right:3%;
+	height:115px;
+}
+.outlet_category .checkbox{
+	float:left;
+	width:100% !important;
+}
+.outlet_category3 .checkbox{
+	float:left;
+	width:50% !important;
+}
+.label_title{
+	float:right;
+	width:85%;
+	background:#c7c7c7;
+	margin:0px;
+	padding:1px 0px;
+	text-align:center;
+	color:#000;
+	margin-right:5%;
+	font-weight:bold;
+	font-size:90%;
+}
+.pro_label_title{
+	width:92%;
+	margin-right:3%;
+}
+.outlet_category label{
+	width:auto;
+}
+
+
+.outlet_category .form-control{
+	width:55% !important;
+}
+.outlet_category2 .input{
+	padding-bottom:3px;
+	float:left;
+	width:100%;
+}
+.outlet_category2 label{
+	width:32%;
+}
+.selection_box{
+	display:none;
+}
+</style>
+
+
+<div class="row">
+    <div class="col-xs-12">
+		<div class="box box-primary">
+        
+        
+        
+			<div class="box-header">
+				<h3 class="box-title"><i class="glyphicon glyphicon-th-large"></i> <?php echo __('Sales Analysis Report'); ?></h3>
+				<?php /*?><div class="box-tools pull-right">
+					<?php if($this->App->menu_permission('nationalSalesReports', 'admin_add')){ echo $this->Html->link(__('<i class="glyphicon glyphicon-plus"></i> New Esales Setting'), array('action' => 'add'), array('class' => 'btn btn-primary', 'escape' => false)); } ?>
+				</div><?php */?>
+			</div>
+            
+            	
+			<div class="box-body">
+				
+                <div class="search-box">
+					<?php echo $this->Form->create('SalesAnalysisReports', array('role' => 'form', 'action'=>'index')); ?>
+					<table class="search">
+                    	 
+                         <tr>
+							<td width="32%" class="date_field left">
+							<div class="required" style="float:left; width:50%;">
+							<?php echo $this->Form->input('date_from', array('class' => 'form-control datepicker','required' => true)); ?>
+                            </div>
+                            <div class="required" style="float:left; width:50%;">
+                            <?php echo $this->Form->input('date_to', array('class' => 'form-control datepicker','required' => true)); ?>
+                            </div>
+                            </td>
+                            
+                            <td width="50%" class="date_field">
+                            	<div style="float:left; width:50%;">
+                                	<div style="padding-bottom:10px; float:left; width:100%;">
+										<?php echo $this->Form->input('product_type', array('label' => 'Product Type :', 'id' => 'product_type', 'class' => 'form-control',  'options' => $product_types, 'empty'=>'---- All ----')); ?>
+                                    </div>
+                                    <div style="padding-bottom:10px; float:left; width:100%;">
+                                    	<?php echo $this->Form->input('location_type_id', array('id'=>'location_type_id','class' => 'form-control', 'empty'=>'---- All ----')); ?>
+                                    </div>
+                                </div>
+                                <div style="float:left; width:50%;">
+                                	<p class="label_title">Outlet Category</p>
+                                    <div id="market_list" class="outlet_category">
+                                    <?php echo $this->Form->input('outlet_category_id', array('id' => 'outlet_category_id', 'label'=>false, 'class' => 'checkbox', 'multiple' => 'checkbox', 'options' => $outlet_categories)); ?>
+                                    </div>
+                                </div>
+                            </td>	
+						</tr>
+                        
+                        <tr>
+							<td class="left">
+                                <label style="float:left; width:20%;">Rows : </label>
+                                <div id="market_list" class="input row_list" style="float:left; width:65%; padding-left:0px;">
+                                <?php echo $this->Form->input('rows', array('legend' => false, 'type' => 'radio', 'id' => 'rows', 'default' => 'so', 'separator'=> '</div><div class="list">', 'class' => 'form-control rows')); ?>
+                                </div>
+                            </td>
+							<td class="date_field">
+                            	<div style="float:left; width:50%;">
+                                	<div style="padding-bottom:10px; float:left; width:100%;">
+									<?php echo $this->Form->input('office_id', array('label' => 'Area Office :', 'id' => 'office_id','class' => 'form-control office_id','required'=>false,'empty'=>'---- All ----')); ?>
+                                    </div>
+                                    <div style="padding-bottom:10px; float:left; width:100%;">
+                                    <?php echo $this->Form->input('territory_id', array('label' => 'Territory/SO :', 'id' => 'territory_id', 'class' => 'form-control', 'required'=>false, 'empty'=>'---- All ----')); ?>
+                                    </div>
+                                </div>
+                                
+                                <div style="float:left; width:50%;">
+                                    <p class="label_title"><b>GEO Location</b></p>
+                                    <div class="outlet_category outlet_category2">
+									<?php echo $this->Form->input('division_id', array('id'=>'division_id', 'class'=> 'form-control', 'empty'=>'---- All ----', 'required'=>false)); ?>
+                                    <?php echo $this->Form->input('district_id', array('id'=>'district_id', 'class'=> 'form-control', 'empty'=>'---- All ----', 'required'=>false)); ?>
+                                    <?php echo $this->Form->input('thana_id', array('id'=> 'thana_id', 'class'=> 'form-control', 'empty'=>'---- All ----', 'required'=>false)); ?>
+                                    </div>
+                                </div>
+                            </td>							
+						</tr>
+                        
+                        
+                        <tr>
+							<td class="left">
+                                <label style="float:left; width:20%;">Columns : </label>
+                                <div id="market_list" class="input row_list" style="float:left; width:65%; padding-left:0px;">
+                                <?php echo $this->Form->input('columns', array('legend' => false, 'type' => 'radio', 'id' => 'columns', 'default' => 'product', 'separator'=> '</div><div class="list">', 'class' => 'form-control columns')); ?>
+                                </div>
+                            </td>
+                            
+							<td>
+                                <div id="product" class="selection_box" style="float:left; width:100%; display:block;">
+                                    <p class="label_title pro_label_title">Product Selection</p>
+                                    <div id="market_list" class="outlet_category outlet_category3">
+                                    <?php echo $this->Form->input('product_id', array('id' => 'product_id', 'label'=>false, 'class' => 'checkbox', 'fieldset' => false, 'multiple' => 'checkbox', 'required'=> true, 'options'=> $product_list)); ?>
+                                    </div>
+                                </div>
+                                
+                                <div id="brand" class="selection_box" style="float:left; width:100%;">
+                                    <p class="label_title pro_label_title">Brand Selection</p>
+                                    <div id="market_list" class="outlet_category outlet_category3">
+                                    <?php echo $this->Form->input('brand_id', array('id' => 'brand_id', 'label'=>false, 'class' => 'checkbox', 'fieldset' => false, 'multiple' => 'checkbox', 'required'=> true, 'options'=> $brands)); ?>
+                                    </div>
+                                </div>
+                                
+                                <div id="category" class="selection_box" style="float:left; width:100%;">
+                                    <p class="label_title pro_label_title">Category Selection</p>
+                                    <div id="market_list" class="outlet_category outlet_category3">
+                                    <?php echo $this->Form->input('product_category_id', array('id' => 'product_category_id', 'label'=>false, 'class' => 'checkbox', 'fieldset' => false, 'multiple' => 'checkbox', 'required'=> true, 'options'=> $categories)); ?>
+                                    </div>
+                                </div>
+                            </td>	
+						</tr>
+                        
+                        
+                        <tr>
+							<td class="left">
+                                <label style="float:left; width:20%;">Indicators : </label>
+                                <div id="market_list" class="input select so_list" style="float:left; width:65%; padding-left:20px;">
+                               
+                                <?php echo $this->Form->input('indicators', array('label'=>false, 'class' => 'checkbox', 'multiple' => 'checkbox', 'options' => $indicators)); ?>
+                                </div>
+                            </td>
+							<td>
+                            	<label style="float:left; width:20%;">Program Sale : </label>
+                                <div id="market_list" class="input select so_list" style="float:left; width:65%; padding-left:20px;">
+                               
+                                <?php echo $this->Form->input('program_type_id', array('label'=>false, 'class' => 'checkbox', 'multiple' => 'checkbox', 'options' => $program_sales)); ?>
+                                </div>
+                            </td>							
+						</tr>
+                        
+                                                 
+                        
+                        
+						
+						<tr align="center">
+							<td colspan="2">
+                            
+								<?php echo $this->Form->submit('Submit', array('type' => 'submit', 'class' => 'btn btn-large btn-primary', 'escape' => false, 'div'=>false, 'name'=>'submit')); ?>
+                                
+                                                              
+								<?php echo $this->Html->link(__('<i class="fa fa-refresh"></i> Reset'), array('action' => ''), array('class' => 'btn btn-warning', 'escape' => false)); ?>
+                                
+                                <?php if(!empty($request_data)){ ?>
+                                <a onclick="PrintElem('content')" class="btn btn-primary"><i class="fa fa-print"></i> Print</a>
+                                <?php } ?>
+                                
+							</td>						
+						</tr>
+					</table>
+                    	
+                    
+					<?php echo $this->Form->end(); ?>
+				</div>
+                
+                
+
+                
+                
+                
+                <?php 
+				pr($request_data);
+				
+				if(!empty($request_data)){ ?>
+                
+                 
+                 
+                 <div id="content" style="width:90%; margin:0 5%;">
+                 
+                    <style type="text/css">
+					.table-responsive { color: #333; font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; line-height: 1.42857; }
+					.report_table{ font-size:12px; }
+					.qty_val{ width:125px; margin:0; float:left; text-transform:capitalize;}
+					.val{ border-right:none; }
+					p{ margin:2px 0px; }
+					.bottom_box{ float:left; width:33.3%; text-align:center; }
+					td, th {padding: 5px;}
+					table { border-collapse: collapse; border-spacing: 0; }
+					.titlerow, .totalColumn{ background:#f1f1f1; }
+					.report_table {margin-bottom: 18px; max-width: 100%; width: 100%;}
+					.table-responsive {min-height: 0.01%;overflow-x: auto;}
+					.titlerow th div{text-transform:capitalize; min-width: 100px; float:left; position:relative;}
+					.titlerow th{text-align:center;}
+					</style>
+                    
+                    
+            		<div class="table-responsive">
+                    
+                        
+                        <div style="float:left; width:100%; text-align:center; padding:20px 0; clear:both;">
+                            <h2 style="margin:2px 0;">Social Marketing Company</h2>
+                            <h3 style="margin:2px 0;">Sales Analysis Report</h3>
+                            <p>
+                                Time Frame : <b><?=date('d M, Y', strtotime($date_from))?></b> to <b><?=date('d M, Y', strtotime($date_to))?></b>
+                            </p>
+                        </div>	 
+                         
+                          
+                          
+                            
+                                                                            
+                        <table id="sum_table" class="text-center report_table" border="1px solid black" cellpadding="10px" cellspacing="0" align="center">
+                            
+                            <?php
+                            $indicators_array = array();
+							if(empty($request_data['SalesAnalysisReports']['indicators'])){	
+								foreach($indicators as $key => $val){array_push($indicators_array, $key);}
+							}else{
+								$indicators_array = $request_data['SalesAnalysisReports']['indicators'];
+							}
+							?>
+                                                
+                            <tr class="titlerow">
+                                <th><div>By <?=$request_data['SalesAnalysisReports']['rows']?></div></th>
+                                <?php 
+								$color = '#f1f1f1';
+								foreach($columns_list as $col_key => $col_val)
+								{
+									$color = ($color=='#f1f1f1')?'#e2e2e2':'#f1f1f1';
+									foreach($indicators as $in_key => $in_val)
+									{ 
+										if(in_array($in_key, $indicators_array))
+										{
+								?>
+                                		<th style="background:<?=$color?>"><div><?=$col_val.' '.$in_val?></div></th>
+                                        
+                                        <?php 
+											} 
+										}
+										?>
+                                <?php } ?>
+                            </tr>
+                            
+                            
+                            <?php 
+							$VolumeValueEC = $results;
+							
+
+							$i=0;
+							
+							/*pr($columns_list);
+							pr($indicators);
+							die();*/
+							
+							foreach($rows_list as $row_key => $row_val){ 
+							?>
+                          	<tr>
+                                <td><?=str_replace('Sales Office', '', $row_val)?></td>
+                                <?php
+								
+								foreach($columns_list as $col_key => $col_val)
+								{
+									//$VolumeValueEC=$SalesAnalysisController->getVolumeValueEC($request_data, $row_key, $col_key);
+																		
+									foreach($indicators as $in_key => $in_val)
+									{ 
+										if(in_array($in_key, $indicators_array))
+										{
+								?>
+                                		<td>
+                                        <div>
+                                        
+											<?php /*?><?=($in_key!='cyp')?sprintf("%01.2f", $VolumeValueEC[0][0][$in_key]):''?><?php */?>
+											
+                                           
+                                           
+                                           
+                                           
+                                           <?php if($request_data['SalesAnalysisReports']['rows']=='month' || $request_data['SalesAnalysisReports']['rows']=='national'){ ?>
+                                          
+                                           		<?=($in_key!='cyp')?@sprintf("%01.2f", $VolumeValueEC[$i][$row_key][$col_key][0][0][$in_key]):''?>
+                                           <?php }else{ ?>
+                                           
+                                           		<?php
+											   if($request_data['SalesAnalysisReports']['columns']=='product' || $request_data['SalesAnalysisReports']['columns']=='brand' || $request_data['SalesAnalysisReports']['columns']=='category' || $request_data['SalesAnalysisReports']['columns']=='outlet_type'){ ?>
+													<?=($in_key!='cyp')?@sprintf("%01.2f", $VolumeValueEC[$row_key][$col_key][$in_key]):''?>
+											   <?php }elseif($request_data['SalesAnalysisReports']['columns']=='national'){ ?>
+													
+													<?=($in_key!='cyp')?@sprintf("%01.2f", $VolumeValueEC[$row_key][$in_key]):''?>
+											   <?php } ?>
+                                           		
+                                           <?php } ?>
+                                           
+                                           
+                                        </div>
+                                        </td>
+                                        <?php 
+											} 
+										}
+										?>
+                                <?php 
+								//echo $i.'<br>';
+								$i++; 
+								} 
+								?>
+                            </tr>
+                            <?php } ?>
+                           
+                            
+                             <?php /*?><tr class="totalColumn" style="font-weight:bold;">
+                                 <td></td>
+                                 <td>Total</td>
+                                 <td class="totalQty"></td>
+                                 <td class="totalQty"></td>
+                                 <td></td>
+                                 <td></td>
+                                 <td class="totalQty"></td>
+                                 <td></td>
+                                 <td></td>
+                             </tr><?php */?>
+                             
+                      </table>
+                      
+                      
+                      	<script>
+						/*var totals_qty = [0,0,0,0,0,0,0,0,0];
+						$(document).ready(function(){
+				
+							var $dataRows = $("#sum_table tr:not('.totalColumn, .titlerow')");
+				
+							$dataRows.each(function() {
+								$(this).find('.qty').each(function(i){  
+									val = $(this).html()?$(this).html():0;  
+									totals_qty[i]+=parseFloat(val);
+								});
+							});
+							
+							$("#sum_table .totalQty").each(function(i){  
+								$(this).html(totals_qty[i].toFixed(2));
+							});
+				
+						});*/
+						</script>
+                            
+                       
+                        
+                        
+                        <div style="width:100%; padding:100px 0 50px;">
+                            <div class="bottom_box">
+                                Prepared by:______________ 
+                            </div>
+                            <div class="bottom_box">
+                                Checked by:______________ 
+                            </div>
+                            <div class="bottom_box">
+                                Signed by:______________
+                            </div>		  
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                
+                <?php } ?>
+                
+                								
+			</div>			
+		</div>
+	</div>
+</div>
+
+
+
+
+<script>
+$(document).ready(function(){
+	$('input').iCheck('destroy');
+	//$("input[type='checkbox']").iCheck('destroy');
+});
+
+$('#office_id').selectChain({
+	target: $('#territory_id'),
+	value:'name',
+	url: '<?= BASE_URL.'sales_people/get_territory_list'?>',
+	type: 'post',
+	data:{'office_id': 'office_id' }
+});
+
+$('#division_id').selectChain({
+	target: $('#district_id'),
+	value:'name',
+	url: '<?= BASE_URL.'sales_analysis_reports/get_district_list'?>',
+	type: 'post',
+	data:{'division_id': 'division_id' }
+});
+
+$('#district_id').selectChain({
+	target: $('#thana_id'),
+	value:'name',
+	url: '<?= BASE_URL.'sales_analysis_reports/get_thana_list'?>',
+	type: 'post',
+	data:{'district_id': 'district_id' }
+});
+
+/*$('#office_id').change(function() {
+	//alert($(this).val());
+  	$.ajax({
+		type: "POST",
+		url: '<?=BASE_URL?>outlet_sales_reports/get_territory_so_list',
+		data: 'office_id='+$(this).val(),
+		cache: false, 
+		success: function(response){
+			//alert(response);						
+			$('.so_list2').html(response);				
+		}
+	});
+});*/
+
+</script>
+
+<script>
+$(document).ready(function(){
+	
+	var columns = $('.columns:checked').val();
+	$('.selection_box').hide();
+	if (columns == 'brand') 
+	{
+		$('#brand').show();
+	}
+	else if (columns == 'category') 
+	{
+		$('#category').show();
+	}
+	else
+	{
+		$('#product').show();
+	}
+	
+	$('.columns').change(function() {
+		//alert(this.value);
+		$('.selection_box').hide();
+        if (this.value == 'brand') 
+		{
+            $('#brand').show();
+        }
+        else if (this.value == 'category') 
+		{
+            $('#category').show();
+        }
+		else
+		{
+			$('#product').show();
+		}
+    });
+	
+});
+
+
+
+$('#product_type').change(function() {
+	//alert($(this).val());
+  	$.ajax({
+		type: "POST",
+		url: '<?=BASE_URL?>sales_analysis_reports/get_product_list',
+		data: 'product_type='+$(this).val(),
+		cache: false, 
+		success: function(response){
+			//alert(response);						
+			$('#product .outlet_category3').html(response);				
+		}
+	});
+});
+
+</script>
+
+
+
+<script>
+	function PrintElem(elem)
+	{
+		var mywindow = window.open('', 'PRINT', 'height=400,width=1000');
+
+		//mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+		mywindow.document.write('<html><head><title></title><style>.csv_btn{display:none;}</style>');
+		mywindow.document.write('</head><body>');
+		//mywindow.document.write('<h1>' + document.title  + '</h1>');
+		mywindow.document.write(document.getElementById(elem).innerHTML);
+		mywindow.document.write('</body></html>');
+
+		mywindow.document.close(); // necessary for IE >= 10
+		mywindow.focus(); // necessary for IE >= 10*/
+
+		mywindow.print();
+		//mywindow.close();
+
+		return true;
+	}
+</script>

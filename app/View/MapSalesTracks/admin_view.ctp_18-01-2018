@@ -1,0 +1,185 @@
+
+<style>
+.search .btn {
+    margin-top: 0px;
+}
+</style>
+
+
+<div class="row">
+
+    <div class="col-xs-12">	
+    	
+		<div class="box box-primary">
+			
+            <div class="box-header">
+				<h3 class="box-title"><i class="glyphicon glyphicon-eye-open"></i> <?php  echo __('Show on Map'); ?></h3>
+				<div class="box-tools pull-right">
+	                <?php echo $this->Html->link(__('<i class="glyphicon glyphicon-th-large"></i> SO on Map'), array('action' => 'index'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+				</div>
+			</div>
+            			
+			<div class="box-body" style="padding-bottom:0px;">
+                <div class="search-box">
+					<?php echo $this->Form->create('MapSalesTrack', array('role' => 'form',  'action'=>'view')); ?>
+					<table class="search">
+						<tr>
+                        	<?php if(!$office_parent_id){ ?>
+                        	<td><?php echo $this->Form->input('office_id', array('id' => 'office_id','class' => 'form-control office_id','required'=>false,'empty'=>'---- Select office ----','options'=>$offices)); ?></td>
+                            <?php } ?>
+                            
+							<td><?php echo $this->Form->input('so_id', array('id' => 'so_id','class' => 'form-control so_id', 'required'=>true,'empty'=>'---- Select SO ----', 'options'=>$so_user_dropdown)); ?></td>
+
+							<td><?php echo $this->Form->input('date', array('class' => 'form-control datepicker', 'required'=>true)); ?></td>
+						
+							<td>
+								<?php echo $this->Form->button('<i class="fa fa-search"></i> Search', array('type' => 'submit','class' => 'btn btn-large btn-primary','escape' => false)); ?>
+								<?php echo $this->Html->link(__('<i class="fa fa-refresh"></i> Reset'), array('action' => ''), array('class' => 'btn btn-warning', 'escape' => false)); ?>
+							</td>
+						</tr>
+					</table>
+					<?php echo $this->Form->end(); ?>
+				</div>
+            </div>
+            
+            
+
+            <?php if($datalists){ ?>
+            
+            <div class="box-body" style="padding-top:0px; height:600px;">    
+                
+                <style>
+				#map_canvas { margin: 0; padding: 0; height: 100% }
+				</style>
+                
+                <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBrqyZeXLzrIP2M2-t-xMUKzFyDz6FupXw&sensor=false"></script>
+                
+                <div id="map_canvas"></div>
+    
+				<script>
+                  var map;
+                  
+                  var mapOptions = { 
+                    center: new google.maps.LatLng(<?=$latitude?>, <?=$longitude?>), 
+                    zoom: 11,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP 
+                  };
+            
+                  function initialize() 
+                  {
+                    map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+            		            
+                    var userCoor = [
+                        <?=$userCoor?>
+                    ];
+					
+					 /*var userCoor = [
+                        ["a", 23.778904, 90.414734],
+						["b", 23.792531, 90.637894],
+						["c", 23.913106, 90.684580],
+						["d", 23.995937, 90.841141],
+						["e", 23.095012, 90.975723]                    
+					];*/
+                                
+                  var userCoorPath = [
+                        <?=$userCoorPath?>
+                    ];
+										
+					/*var userCoorPath = [
+                      {lat: 23.778904, lng: 90.414047},
+                      {lat: 23.792531, lng: 90.637894},
+                      {lat: 23.913106, lng: 90.684586},
+                      {lat: 23.995937, lng: 90.841141},
+                      {lat: 24.095012, lng: 90.975723}
+                    ];*/
+                                
+                    var userCoordinate = new google.maps.Polyline({
+                    path: userCoorPath,
+                    strokeColor: "#FF0000",
+                    strokeOpacity: 1,
+                    strokeWeight: 2
+                    });
+                    
+                    userCoordinate.setMap(map);
+                    
+                    var infowindow = new google.maps.InfoWindow();
+                    
+                    var marker, i;
+					
+					//icon = new google.maps.MarkerImage('http://maps.google.com/mapfiles/ms/micons/green.png', size, origin, anchor);
+					
+                    
+                    for (i = 0; i < userCoor.length; i++) { 
+					
+					  if(i==0){
+					  	path = google.maps.SymbolPath.FORWARD_CLOSED_ARROW;
+					  }else{
+					  	path = google.maps.SymbolPath.CIRCLE;
+					  }
+					 
+                      marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(userCoor[i][1], userCoor[i][2]),
+                        //icon: lineSymbol,
+						icon: {
+                          path: path,
+                          scale: 3
+                        },
+                        draggable: false,
+                        map: map
+                      });
+                    
+                    
+                      google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                        return function() {
+                          infowindow.setContent(userCoor[i][0]);
+                          infowindow.open(map, marker);
+                        }
+                      })(marker, i));
+                            
+                    }
+            
+                 }
+                  google.maps.event.addDomListener(window, 'load', initialize);
+                </script>
+			</div>
+            
+            <?php }else{ ?>
+            
+            	<div class="box-body" style="height:600px;  text-align:center;">  
+           			<h3>No data found!</h3>
+                </div>
+            <?php } ?>
+            
+            				
+		</div>
+            			
+	</div>
+
+
+</div><!-- /#page-container .row-fluid -->
+
+
+<script>
+$(document).ready(function(){
+	
+	
+	$('#office_id').selectChain({
+		target: $('#so_id'),
+		value:'name',
+		url: '<?= BASE_URL.'map_sales_tracks/get_so_list_by_office'?>',
+		type: 'post',
+		data:{'office_id': 'office_id' }
+	});
+	
+	
+
+	
+	
+
+});
+</script>
+
+
+<?php
+//exit;
+?>

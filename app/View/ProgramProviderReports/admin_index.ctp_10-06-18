@@ -1,0 +1,435 @@
+<?php
+App::import('Controller', 'ProgramProviderReportsController');
+$ProgramProviderReportsController = new ProgramProviderReportsController;
+?>
+<?php //pr($so_info); ?>
+
+
+<style>
+.search .radio label {
+    width: auto;
+	float:none;
+	padding-left:5px;
+}
+.search .radio legend {
+    float: left;
+    margin: 5px 20px 0 0;
+    text-align: right;
+    width: 30%;
+	display: inline-block;
+    font-weight: 700;
+	font-size:14px;
+	border-bottom:none;
+}
+#market_list .checkbox label{
+	padding-left:10px;
+	width:auto;
+}
+#market_list .checkbox{
+	width:30%;
+	float:left;
+	margin:1px 0;
+}
+.filter_type_box div.input{
+	float:left;
+	position:relative;
+	width:50%;
+}
+.filter_type_box div.input, .filter_type_box div.filter_type{
+	float:left;
+	position:relative;
+	width:25%;
+	margin:0px;
+}
+.filter_type_box div.input input {
+    float: left;
+    margin-left: 10px;
+    margin-top: 2px;
+    position: relative;
+    width: auto;
+}
+.filter_type_box div.input label{
+	float:left;
+	padding-left:10px;
+	font-weight:normal;
+}
+div.filter_type{
+	margin:0px;
+}
+.filter_type_box div.filter_type input {
+    float: left;
+    margin-left:0px;
+    margin-top: 2px;
+    position: relative;
+    width: auto;
+}
+.filter_type_box div.filter_type label{
+	float:left;
+	padding-left:10px;
+	font-weight:normal;
+	width:80%;
+	text-align:left;
+}
+.offcie_area select{
+	width:49% !important;
+}
+	
+.offcie_box label{
+	width:44%;
+}
+#sum_table tr th, #sum_table tr td{
+	padding:5px;
+}
+</style>
+
+
+
+<div class="row">
+
+    <div class="col-xs-12">
+        <div class="box box-primary">
+            <div class="box-header">
+                <h3 class="box-title"><i class="glyphicon glyphicon-th-large"></i> <?php echo __('Program Provider Report'); ?></h3>
+            </div>	
+            
+            <div class="box-body">
+                <div class="search-box">
+                    <?php echo $this->Form->create('ProgramProviderReports', array('role' => 'form')); ?>
+                    <table class="search">
+    					<tr>
+							<td class="required" width="50%"><?php echo $this->Form->input('date_from', array('class' => 'form-control datepicker','required' => true)); ?></td>
+                            
+                            <td class="required" width="50%"><?php echo $this->Form->input('date_to', array('class' => 'form-control datepicker','required' => true)); ?></td>	
+						</tr>
+
+                        <tr>
+							<td width="50%">
+							<?php echo $this->Form->input('program_type_id', array('label' => 'Program :', 'id' => 'program_type_id', 'class' => 'form-control',  'options' => $programs)); ?>
+                            </td>
+                            
+                            <td width="50%">
+							<?php echo $this->Form->input('status', array('label' => 'Provider Status :', 'id' => 'status', 'class' => 'form-control',  'options' => $status, 'empty'=>'---- All ----')); ?>
+                            </td>
+						</tr>
+                        
+                        
+                        <tr>
+							<td colspan="2">
+                             <label style="width:15%;" for="program">Type :</label>
+                             <div class="filter_type_box" style="width:80%; float:left; position:relative;">
+							 <?php echo $this->Form->input('filter_type', array('legend' => false, 'onclick' => 'filterSelect()', 'type' => 'radio', 'id' => 'filter_type', 'default' => '1',  'options' => $filter_types, 'separator'=> '</div><div class="filter_type">', 'class' => 'form-control type')); ?>
+                             </div>
+                            </td>
+						</tr>
+                        
+                        
+                        <tr>
+							<td colspan="2" width="100%" class="offcie_area">
+                                <div class="col-md-4 offcie_box">
+                                    <div class="type_box_1 type_box">
+                                        <?php echo $this->Form->input('office_id', array('label' => 'Office :', 'id' => 'office_id', 'class' => 'form-control', 'empty'=>'---- All ----')); ?>
+                                    </div>
+                                    <div class="type_box_2 type_box" style="display:none;">
+                                        <?php echo $this->Form->input('division_id', array('label' => 'Division :', 'id' => 'division_id', 'class' => 'form-control', 'empty'=>'---- All ----')); ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="type_box_1 type_box">
+                                        <?php echo $this->Form->input('territory_id', array('label' => 'Territory :', 'id' => 'territory_id', 'class' => 'form-control', 'empty'=>'---- All ----')); ?>
+                                    </div>
+                                    <div class="type_box_2 type_box" style="display:none;">
+                                        <?php echo $this->Form->input('district_id', array('label' => 'District :', 'id' => 'district_id', 'class' => 'form-control', 'empty'=>'---- All ----')); ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    
+                                    <?php echo $this->Form->input('thana_id', array('label' => 'Thana :', 'id' => 'thana_id', 'class' => 'form-control', 'empty'=>'---- All ----')); ?>
+                                   
+                                </div>
+                            </td>
+						</tr>
+                        
+                        
+                        <tr>
+							<td colspan="2">
+                             <label style="width:15%;">Report Type :</label>
+                             <div class="filter_type_box" style="width:80%; float:left; position:relative;">
+							 <?php echo $this->Form->input('report_type', array('legend' => false, 'type' => 'radio', 'id' => 'report_type', 'default' => '1',  'options' => $report_types, 'separator'=> '</div><div class="filter_type">', 'class' => 'form-control')); ?>
+                             </div>
+                            </td>
+						</tr>
+                        
+                        
+                        
+                        <tr align="center">
+							<td colspan="2">
+								<?php echo $this->Form->button('<i class="fa fa-search"></i> Submit', array('type' => 'submit','class' => 'btn btn-large btn-primary', 'escape' => false)); ?>
+								<?php echo $this->Html->link(__('<i class="fa fa-refresh"></i> Reset'), array('action' => ''), array('class' => 'btn btn-warning', 'escape' => false)); ?>
+                                
+                                <?php if(!empty($request_data)){ ?>
+								<button onclick="PrintElem('content')" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+								<?php } ?>
+                                
+							</td>						
+						</tr>
+                    </table>	
+                    <?php echo $this->Form->end(); ?>
+                    
+                    <script>
+					$(document).ready(function() {
+						$('input').iCheck('destroy');
+					});
+					</script>
+                    
+                    
+                  
+                  	<?php if(!empty($request_data)){ ?>
+                    <div class="row">
+                    
+                        <div id="content" style="width:90%; margin:0 5%;">
+						   <style type="text/css">
+							.table-responsive { color: #333; font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; line-height: 1.42857; }
+							.report_table{ font-size:13px; }
+							.qty_val{ width:100px; margin:0; float:left; text-transform:capitalize;}
+							.qty, .val{ width:49%; float:left; border-right:#333 solid 1px; text-align:center; padding:5px 0;}
+							.val{ border-right:none; }
+							p{ margin:2px 0px; }
+							.bottom_box{ float:left; width:33.3%; text-align:center; }
+							td, th {padding: 0;}
+							table { border-collapse: collapse; border-spacing: 0; }
+							.titlerow, .totalColumn{ background:#f1f1f1; }
+							.rowDataSd, .totalCol {font-size:85%;}
+							.report_table {margin-bottom: 18px; max-width: 100%; width: 100%;}
+							.table-responsive {min-height: 0.01%;overflow-x: auto;}
+						   </style>
+                            
+                    		
+                            
+                            
+                            
+                            <div class="table-responsive">
+                            
+                            
+                            	
+                                <div class="pull-right csv_btn" style="padding-top:20px;">
+									<?=$this->Html->link(__('Dwonload XLS'), array('action' => 'dwonload_xls'), array('class' => 'btn btn-primary', 'escape' => false)); ?>
+                                </div>
+                                
+                                <div style="width:100%; text-align:center; padding:20px 0;">
+                                    <h2 style="margin:10px 0;">Social Marketing Company</h2>
+                                    <h3 style="margin:10px 0; font-size:18px;">Program Provider Report of SMC Contraceptive, ORS and Orther Helth Products</h3>
+                                    <p>
+                                        Time Frame : <b><?=date('d M, Y', strtotime($date_from))?></b> to <b><?=date('d M, Y', strtotime($date_to))?></b> <?php /*?><br>Reporting Date: <b><?php echo date('d F, Y')?></b><?php */?>
+                                    </p>
+                                    
+                                </div>  
+                                
+                                <?php if($request_data['ProgramProviderReports']['report_type']==1){ ?>
+                                
+                                    <h5>Detail Report</h5>
+                                    <div style="float:left; width:100%; height:450px; overflow:scroll;">  
+                                      <table id="sum_table" class="text-center report_table" border="1px solid black" cellpadding="10px" cellspacing="0" align="center" style="margin-bottom:-1px;">
+                                          <tr class="titlerow">
+                                              <th><?=($request_data['ProgramProviderReports']['filter_type']==1)?'Sales Office':'Division'?></th>
+                                              <th><?=($request_data['ProgramProviderReports']['filter_type']==1)?'Territory':'District'?></th>
+                                              <th>Thana</th>
+                                              <th>Outlet Name</th>
+                                              <th>Enrolled Date</th>
+                                              <th>Drop Date</th>
+                                              <th>Drop Reason</th>
+                                          </tr>
+                                          
+                                          
+                                          <?php if($results){ ?>
+                                          
+											  <?php foreach($results as $result){ ?>
+                                              <tr>
+                                                   <td><?=($request_data['ProgramProviderReports']['filter_type']==1)?
+                                                    	str_replace('Sales Office', '', $result['Office']['office_name']):$result['Division']['name'];?></td>
+                                                   <td><?=($request_data['ProgramProviderReports']['filter_type']==1)?$result['Territory']['name']:$result['District']['name']?></td>
+                                                   <td><?=$result['Thana']['name']?></td>
+                                                   <td><?=$result['Outlet']['name']?></td>
+                                                   <td><?=date('d-m-Y', strtotime($result['Program']['assigned_date']))?></td>
+                                                   <td><?=$result['Program']['deassigned_date']?date('d-m-Y', strtotime($result['Program']['deassigned_date'])):''?></td>
+                                                   <td><?=$result['Program']['reason']?></td>
+                                              </tr>
+                                              <?php } ?>
+                                              
+                                          <?php }else{ ?>
+                                              <tr>
+                                                <td colspan="7" style="text-align:center;"><h4>No Result Found!</h4></td>
+                                              </tr>
+                                          <?php } ?>
+                                          
+                                          
+                                      </table>   
+                                     </div>
+                                   
+                                <?php }else{ ?>
+                                	
+                                    <h5>Summary Report</h5>
+                                    <div style="float:left; width:100%; height:450px; overflow:scroll;">  
+                                      <table id="sum_table" class="text-center report_table" border="1px solid black" cellpadding="10px" cellspacing="0" align="center" style="margin-bottom:-1px;">
+                                           
+                                           <tr class="titlerow">
+                                              	<th><?=($request_data['ProgramProviderReports']['filter_type']==1)?'Sales Office':'Division'?></th>
+                                              	<th><?=($request_data['ProgramProviderReports']['filter_type']==1)?'Territory':'District'?></th>
+                                              	<th>Thana</th>
+                                              	<th>Active Provider</th>
+                                              	<th>Visited Provider (OC)</th>
+                                              	<th>Total Visit (EC)</th>
+                                              	<th>Total Revenue</th>
+                                              	<th>CYP</th>
+                                            </tr>
+                                          
+                                         	<?php if($results){ ?>
+                                            	<?php foreach($results as $result){ ?>
+                                                <tr>
+                                                    <td><?=($request_data['ProgramProviderReports']['filter_type']==1)?
+                                                    	str_replace('Sales Office', '', $result['Office']['office_name']):$result['Division']['name'];?></td>
+                                                    <td><?=($request_data['ProgramProviderReports']['filter_type']==1)?$result['Territory']['name']:$result['District']['name']?></td>
+                                                    <td><?=$result['Thana']['name']?></td>
+                                                    <td><?=$result[0]['active']?></td>
+                                                    
+                                                    <td><?=@$final_results[$result['Thana']['id']]['oc']?$final_results[$result['Thana']['id']]['oc']:0?></td>
+                                                    <td><?=@$final_results[$result['Thana']['id']]['ec']?$final_results[$result['Thana']['id']]['ec']:0?></td>
+                                                    <td><?=@$final_results[$result['Thana']['id']]['value']?sprintf("%01.2f", $final_results[$result['Thana']['id']]['value']):0?></td>
+                                                    <td><?=@$final_results[$result['Thana']['id']]['cyp']?$final_results[$result['Thana']['id']]['cyp']:0?></td>
+                                                </tr>
+                                                <?php } ?>
+                                            <?php }else{ ?>
+                                              <tr>
+                                                <td colspan="8" style="text-align:center;"><h4>No Result Found!</h4></td>
+                                              </tr>
+                                          <?php } ?>
+                                          
+                                          
+                                      </table>   
+                                    </div>
+                                
+                                <?php } ?>
+                                
+                                
+                     
+                                <div style="float:left; width:100%; padding:100px 0 50px;">
+                                    <div class="bottom_box">
+                                        Prepared by:______________ 
+                                    </div>
+                                    <div class="bottom_box">
+                                        Checked by:______________ 
+                                    </div>
+                                    <div class="bottom_box">
+                                        Signed by:______________
+                                    </div>		  
+                                </div>
+                                
+                                
+                            </div>
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                        
+    				</div>
+                    <?php } ?>
+                    
+    			</div>	
+    		</div>	
+            		
+    	</div>
+    </div>
+
+</div>
+
+
+
+
+<script>
+$('#office_id').selectChain({
+	target: $('#territory_id'),
+	value:'name',
+	url: '<?= BASE_URL.'sales_people/get_territory_list'?>',
+	type: 'post',
+	data:{'office_id': 'office_id' }
+});
+
+$('#territory_id').selectChain({
+	target: $('#thana_id'),
+	value:'name',
+	url: '<?= BASE_URL.'programs/get_thana_list'?>',
+	type: 'post',
+	data:{'territory_id': 'territory_id','location_type_id':''}
+});
+
+$('#division_id').selectChain({
+	target: $('#district_id'),
+	value:'name',
+	url: '<?= BASE_URL.'sales_analysis_reports/get_district_list'?>',
+	type: 'post',
+	data:{'division_id': 'division_id' }
+});
+
+$('#district_id').selectChain({
+	target: $('#thana_id'),
+	value:'name',
+	url: '<?= BASE_URL.'sales_analysis_reports/get_thana_list'?>',
+	type: 'post',
+	data:{'district_id': 'district_id' }
+});
+
+
+$('#office_id').change(function (){
+	$('#territory_id').html('<option value="">---- All -----</option>');
+});	
+$('#office_id').change(function (){
+	$('#thana_id').html('<option value="">---- All -----</option>');
+});
+$('#division_id').change(function (){
+	$('#district_id').html('<option value="">---- All -----</option>');
+});	
+$('#division_id').change(function (){
+	$('#thana_id').html('<option value="">---- All -----</option>');
+});
+
+
+function filterSelect()
+{
+	var type = $('.type:checked').val();
+	
+	$('.offcie_area select option:nth-child(1)').prop("selected", true).change();
+		
+	$('.type_box').hide();
+	
+	$('.type_box_'+type).show();
+	
+	//alert(type);
+	
+}
+
+</script>
+
+<script>
+    function PrintElem(elem)
+    {
+        var mywindow = window.open('', 'PRINT', 'height=600,width=960');
+
+        mywindow.document.write('<html><head><title></title><?php echo $this->Html->css('bootstrap.min.css');
+echo $this->fetch('css');?>');
+        mywindow.document.write('</head><body >');
+        //mywindow.document.write('<h1>' + document.title  + '</h1>');
+        mywindow.document.write(document.getElementById(elem).innerHTML);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close(); // necessary for IE >= 10
+        mywindow.focus(); // necessary for IE >= 10*/
+
+        mywindow.print();
+        mywindow.close();
+
+        return true;
+    }
+</script>

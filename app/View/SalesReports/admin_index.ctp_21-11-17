@@ -1,0 +1,231 @@
+<?php
+//print_r($report_flag);die();
+?>
+	<style>
+		table, th, td {
+			/*border: 1px solid black;*/
+			border-collapse: collapse;
+		}
+		#content { display: <?php 
+			if (!empty($office_id)) {
+				echo 'block';
+			}else{
+				echo 'none';
+			}
+		?>; }
+		@media print
+			{
+				#non-printable { display: none; }
+				#content { display: block; }
+				table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+			}
+    </style>
+<div class="row">
+    <div class="col-xs-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<h3 class="box-title"><i class="glyphicon glyphicon-th-large"></i> <?php echo __('Sales Report'); ?></h3>
+			</div>	
+			<div class="box-body">
+				<div class="search-box">
+					<?php echo $this->Form->create('Memo', array('role' => 'form')); ?>
+					<table class="search">
+						<tr>
+							<td width="50%"><?php echo $this->Form->input('office_id', array('id' => 'office_id','class' => 'form-control office_id','required'=>false,'empty'=>'---- Select Office ----')); ?></td>
+							<td>
+								<?php echo $this->Form->input('date_from', array('class' => 'form-control datepicker','value'=>(isset($this->request->data['Memo']['date_from'])=='' ? $current_date : $this->request->data['Memo']['date_from']),'required'=>false)); ?>
+							</td>						
+						</tr>	
+						<tr>
+							<td width="50%"></td>
+							<td>
+								<?php echo $this->Form->input('date_to', array('class' => 'form-control datepicker','value'=>(isset($this->request->data['Memo']['date_to'])=='' ? $current_date : $this->request->data['Memo']['date_to']),'required'=>false)); ?>
+							</td>
+						</tr>
+						<tr align="center">
+							<td colspan="2">
+								<?php echo $this->Form->button('<i class="fa fa-search"></i> Search', array('type' => 'submit','id'=>'search_button','class' => 'btn btn-large btn-primary','escape' => false)); ?>
+								<?php echo $this->Html->link(__('<i class="fa fa-refresh"></i> Reset'), array('action' => ''), array('class' => 'btn btn-warning', 'escape' => false)); ?>
+							
+								<?php
+									if (!empty($office_id)) {
+									?>
+										<button onclick="PrintElem('content')" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+									<?php
+									}
+								?>
+									
+							</td>						
+						</tr>
+					</table>	
+					<?php echo $this->Form->end(); ?>
+				</div>
+				
+			</div>
+
+
+
+<!-- Report Print -->
+
+	<div id="content" style="width:90%;height:100%;margin-left:5%;margin-right:5%;">
+		<!-- <div style="text-align:right;width:100%;">Page No :1 of 1</div>
+		<div style="text-align:right;width:100%;">Print Date :19 Jul 2017</div> -->
+		
+
+		<div style="width:100%;text-align:center;float:left">
+			<h2>SMC Enterprise Limited</h2>
+			<h3>Top Sheet</h3>
+			<h2><u>Sales Report</u></h2>
+			<h5><?php if(!empty($requested_data)){ ?><strong>Between:</strong>&nbsp;&nbsp;<u><?php  echo $requested_data['Memo']['date_from']; ?>&nbsp;&nbsp;to&nbsp;&nbsp;<?php echo $requested_data['Memo']['date_to']; }?></u>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Reporting Date:</strong>&nbsp;&nbsp;<?php echo date('d-F-Y');?></h5>
+			<h4>Area : <?php echo $offices[$requested_data['Memo']['office_id']];?></h4>
+		</div>	  
+		
+		<!-- product quantity get-->
+		<?php
+		$product_qnty=array();
+
+		foreach ($product_quantity as $data) {
+			
+
+			$product_qnty[$data['0']['sales_person_id']][$data['0']['product_id']]=$data['0']['pro_quantity'];
+			
+		}
+		?>
+		<table style="width:100%" border="1px solid black" cellpadding="10px" cellspacing="0" align="center">
+			  <tr>
+			  		<th>Sales Officer</th>
+				  <?php
+				  	foreach ($product_name as $value) {
+				  ?>
+				  	<th <?php if($value['Product']['product_category_id']==20){echo 'class="condom"';}else if($value['Product']['product_category_id']==21){echo 'class="pill"';}?>><?php echo $value['Product']['name'].'<br>['.$value['0']['mes_name'].']';?></th>
+				  <?php 
+				  	} 
+				  ?>
+				  <script>
+				
+				  	$('.condom:last').after("<th>Total Condom</th>");
+				  	$('.pill:last').after("<th>Total Pill</th>")
+				  </script>
+			  </tr>
+			  <?php
+			  	foreach ($sales_people as $data_s) {
+			  ?>
+			  <tr>
+				<td><?=$data_s['SalesPerson']['name']?></td>
+				 <?php
+				 
+				  	foreach ($product_name as $data_q) {
+				  ?>
+				  	<td <?php if($data_q['Product']['product_category_id']==20){echo 'class="condom_'.$data_s['0']['sales_person_id'].'"';}else if ($data_q['Product']['product_category_id']==21) {
+				  		echo 'class="pill_'.$data_s['0']['sales_person_id'].'"';
+				  	}?>>
+				  	<?php 
+				  		if(array_key_exists($data_q['Product']['id'], $product_qnty[$data_s['0']['sales_person_id']])){
+				  			echo $product_qnty[$data_s['0']['sales_person_id']][$data_q['Product']['id']];
+				  		}
+				  		else echo '0.00';
+				  	?>
+				  		
+				  	</td>
+				  <?php 
+				  	} 
+				  ?>
+				  <script>
+				  /**
+				   * [total_condom description]
+				   * @type {Number}
+				   */
+				  	var total_condom=0.0;
+				  	$('.condom_<?php echo $data_s['0']['sales_person_id']?>').each(function(){
+				  		total_condom+=parseFloat($(this).text());
+				  	});
+				  	$('.condom_<?php echo $data_s['0']['sales_person_id']?>:last').after('<td>'+total_condom+'</td>')
+				  	/**
+				  	 * [total_pill description]
+				  	 * @type {Number}
+				  	 */
+				  	var total_pill=0.0;
+				  	$('.pill_<?php echo $data_s['0']['sales_person_id']?>').each(function(){
+				  		total_pill+=parseFloat($(this).text());
+				  	});
+				  		$('.pill_<?php echo $data_s['0']['sales_person_id']?>:last').after('<td>'+total_pill+'</td>')
+				  </script>
+			  </tr>
+			  <?php }?>
+      </table>
+	  
+		<div style="width:100%;padding-top:100px;">
+			<div style="width:33%;text-align:left;float:left">
+				Prepared by:______________ 
+			</div>
+			<div style="width:33%;text-align:center;float:left">
+				Checked by:______________ 
+			</div>
+			<div style="width:33%;text-align:right;float:left">
+				Signed by:______________
+			</div>		  
+		</div>
+		
+	</div>
+
+		</div>
+	</div>
+</div>
+<script>
+$('.office_id').selectChain({
+	target: $('.territory_id'),
+	value:'name',
+	url: '<?= BASE_URL.'sales_people/get_territory_list'?>',
+	type: 'post',
+	data:{'office_id': 'office_id' }
+});
+
+$('.territory_id').selectChain({
+	target: $('.market_id'),
+	value:'name',
+	url: '<?= BASE_URL.'admin/doctors/get_market';?>',
+	type: 'post',
+	data:{'territory_id': 'territory_id' }
+});
+
+$('.market_id').selectChain({
+	target: $('.outlet_id'),
+	value:'name',
+	url: '<?= BASE_URL.'admin/doctors/get_outlet';?>',
+	type: 'post',
+	data:{'market_id': 'market_id' }
+});
+
+$('.office_id').change(function(){
+	$('.market_id').html('<option value="">---- Select Market ----');
+	$('.outlet_id').html('<option value="">---- Select Outlet ----');
+});
+
+$('.territory_id').change(function(){
+	$('.outlet_id').html('<option value="">---- Select Outlet ----');
+});
+</script>
+<script>
+	function PrintElem(elem)
+	{
+		var mywindow = window.open('', 'PRINT', 'height=400,width=1000');
+
+		//mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+		mywindow.document.write('<html><head><title></title>');
+		mywindow.document.write('</head><body >');
+		//mywindow.document.write('<h1>' + document.title  + '</h1>');
+		mywindow.document.write(document.getElementById(elem).innerHTML);
+		mywindow.document.write('</body></html>');
+
+		mywindow.document.close(); // necessary for IE >= 10
+		mywindow.focus(); // necessary for IE >= 10*/
+
+		mywindow.print();
+		mywindow.close();
+
+		return true;
+	}
+</script>

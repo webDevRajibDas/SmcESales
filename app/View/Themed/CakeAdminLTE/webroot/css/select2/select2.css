@@ -1,0 +1,10 @@
+@import "theme/select2.min.css";
+@import "theme/select2-bootstrap.css";
+@import "theme/pmd-select2.css";
+
+.select2-container--bootstrap {
+	display:inline-block;
+}
+.select2-container{
+	margin-top:5px;
+}

@@ -1,0 +1,414 @@
+
+<?php //pr($so_info); ?>
+
+
+<style>
+.search .radio label {
+    width: auto;
+	float:none;
+	padding-left:5px;
+}
+.search .radio legend {
+    float: left;
+    margin: 5px 20px 0 0;
+    text-align: right;
+    width: 30%;
+	display: inline-block;
+    font-weight: 700;
+	font-size:14px;
+	border-bottom:none;
+}
+#market_list .checkbox label{
+	padding-left:10px;
+	width:auto;
+}
+#market_list .checkbox{
+	width:30%;
+	float:left;
+	margin:1px 0;
+}
+</style>
+
+
+<div class="row">
+
+    <div class="col-xs-12">
+        <div class="box box-primary">
+            <div class="box-header">
+                <h3 class="box-title"><i class="glyphicon glyphicon-th-large"></i> <?php echo __('Current Inventory Reports'); ?></h3>
+            </div>	
+            <div class="box-body">
+                <div class="search-box">
+                    <?php echo $this->Form->create('search', array('role' => 'form')); ?>
+                    <table class="search">
+    
+                        <tr>
+                            <td width="50%"><?php echo $this->Form->input('office_id', array('class' => 'form-control','empty'=>'---- Select Office ----','required'=>true)); ?></td>
+    						<td width="50%"><?php echo $this->Form->input('unit_type', array('legend'=>'Unit Type :', 'type' => 'radio', 'options' => $unit_type, 'required'=>true)); ?></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <?php echo $this->Form->input('date_from', array('class' => 'form-control datepicker','required'=>true)); ?>
+                            </td>
+                            <td>
+                                <?php echo $this->Form->input('date_to', array('class' => 'form-control datepicker','required'=>true)); ?>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td colspan="2">
+                            <label style="float:left; width:15%;">Products : </label>
+                            <div id="market_list" class="input select" style="float:left; width:80%; padding-left:20px;">
+                            <?php echo $this->Form->input('product_id', array('id' => 'product_id', 'label'=>false, 'class' => 'checkbox', 'fieldset' => false, 'multiple' => 'checkbox', 'required'=> true, 'options'=> $product_list)); ?>
+                            </div>
+                            </td>
+                        </tr>
+                        
+                        <tr align="center">
+                            <td colspan="2">
+                                <?php echo $this->Form->button('<i class="fa fa-search"></i> Search', array('type' => 'submit','class' => 'btn btn-large btn-primary','escape' => false)); ?>
+                                <?php echo $this->Html->link(__('<i class="fa fa-refresh"></i> Reset'), array('action' => ''), array('class' => 'btn btn-warning', 'escape' => false)); ?>
+                                <?php if(!empty($Store) && !empty($so_info)){?>
+                                <button type="button" onclick="PrintElem('content')" class="btn btn-primary">
+                                    <i class="glyphicon glyphicon-print"></i> Print
+                                </button>
+                        <?php }?>
+                            </td>						
+                        </tr>
+                    </table>	
+                    <?php echo $this->Form->end(); ?>
+                    
+        <div class="row">
+            <div id="content" style="width:90%;height:100%;margin-left:5%;margin-right:5%;">
+                <style type="text/css">
+                    @media print
+                    {
+                        #non-printable { display: none; }
+                        #content { 
+                            display: block;
+                        }
+                        table{
+                            width:100%;
+                            font-size: 11px;
+                            height: inherit;
+                            page-break-after: always;
+                        }
+                        
+                        table, th, td {
+                            border: 1px solid black;
+                            border-collapse: collapse;
+                        }
+                        footer{
+                            position: fixed;
+                            bottom: 0;
+                            font-size: 10px;
+                        }
+                        .footer1{
+                            width:100%;
+                            height: 100px;
+                            position: absolute;
+                            font-size: 10px;
+                            overflow-y: inherit;
+                        }
+    
+                        .font_size{
+                            font-size: 11px;
+                        }
+                        .page-break{
+                            page-break-after: always;
+                        }
+                        #heading_name{
+                            font-size: 24px;
+                        }
+                        #heading_add{
+                            font-size: 18px;
+                        }
+                        .page_header{
+                            width:100%;
+                            font-weight: normal;
+                            font-size: 8px;
+                            float: right;
+                            text-align: right;
+                            margin-right: 3%;
+    /* position: relative;
+    top:0px;normal
+    right:0px;
+    width:30%;
+    font-size: 8px;
+    margin-bottom: 10px;*/
+    }
+    @page {size: auto;  margin: 30px; }
+    }
+    
+    </style>
+            <!-- <div style="text-align:right;width:100%;">Page No :1 of 1</div>
+            <div style="text-align:right;width:100%;">Print Date :19 Jul 2017</div> -->
+            
+        <?php if(!empty($Store) && !empty($so_info)){ ?>
+    
+            <div style="width:100%;">
+                <div style="width:25%;text-align:left;float:left">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+                <div style="width:50%;text-align:center;float:left">
+                    <font id="heading_name"><b>SMC Enterprise Limited</b></font><br>
+                    <span id="heading_add">SMC Tower, 33 Banani C/A, Dhaka- 1213</span><br>
+                    <font><b>Stock Status By SO</b></font><br>
+                    <font><b>Issueing Office : <?php echo h($offices[$this->request->data['search']['office_id']]); ?></b></font><br>
+                    <font><?php if(!empty($this->request->data)){ ?><strong>Between:</strong>&nbsp;&nbsp;<u><?php  echo date('d-F-Y',strtotime($this->request->data['search']['date_from'])); ?>&nbsp;&nbsp;to&nbsp;&nbsp;<?php echo date('d-F-Y',strtotime($this->request->data['search']['date_to'])); }?></u>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Reporting Date:</strong>&nbsp;&nbsp;<?php echo date('d-F-Y');?></font>
+                </div>
+                <div style="width:25%;text-align:right;float:left">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                </div>        
+            </div>  
+            
+            <table style="width:100%;text-align:center; margin-bottom: 50px;" border="1px solid black" cellpadding="0px" cellspacing="0" align="center" class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>Sales Officer</th>
+                    <th></th>
+                    <?php
+                    foreach ($products as $value) {
+                        ?>
+                        <th class="text-center"><?php echo $value['Product']['name'].'<br>['.$unit_type_text.']';?></th>
+                        <?php 
+                    } 
+                    ?>
+                </tr>
+                </thead>
+                
+                <tbody>
+                <?php 
+                $i=1; 
+				// pr($Store);die;
+				foreach ($Store as $data)
+				{ 
+				?>
+                    <tr>
+                        <td rowspan="7" ><?=$data['sp']['name']?></td>
+                        <td style="text-align:left">Open</td>
+                        <?php
+                        foreach ($products as $value) {
+                            ?>
+                            <td id="<?php echo $data['Store']['id'].'_'.$value['Product']['id'].'o';?>">
+                                <?php 
+                                if(!empty($so_info[$data['Store']['id']]['OB']))
+								{
+									if(array_key_exists($value['Product']['id'], $so_info[$data['Store']['id']]['OB']))
+									{
+										echo $so_info[$data['Store']['id']]['OB'][$value['Product']['id']];
+									}
+									else 
+									{
+										echo '0.00';
+									}
+								}
+                                else 
+								{
+                                    echo '0.00';
+                                }
+                            ?>
+                                
+                            </td>
+                            <?php 
+                        } 
+                        ?>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left">Received</td>
+                        <?php
+                        foreach ($products as $value) {
+                            ?>
+                            <td id="<?php echo $data['Store']['id'].'_'.$value['Product']['id'].'r';?>">
+                                <?php 
+                                if(!empty($so_info[$data['Store']['id']]['RCV']))
+								{
+									if(array_key_exists($value['Product']['id'], $so_info[$data['Store']['id']]['RCV']))
+									{
+										echo $so_info[$data['Store']['id']]['RCV'][$value['Product']['id']];
+									}
+									else
+									{ 
+										echo '0.00';
+									}
+                            	}
+                                else 
+								{
+                                    echo '0.00';
+                                }
+                            ?>
+                            </td>
+                            <?php 
+                        } 
+                        ?>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left">Total</td>
+                        <?php
+                        foreach ($products as $value) {
+                            ?>
+                            <td><script>
+                            // var open=$('#<?php echo $data["Store"]["id"]."_".$value["Product"]["id"]."o";?>').text();
+                            // console.log(open);
+                                var total=parseFloat($('#<?php echo $data["Store"]["id"]."_".$value["Product"]["id"]."o";?>').text())+parseFloat($('#<?php echo $data["Store"]["id"]."_".$value["Product"]["id"]."r";?>').text());
+                                document.write(parseFloat(total).toFixed(2));
+                            </script></td>
+                            <?php 
+                        } 
+                        ?>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left">Sales</td>
+                        <?php foreach ($products as $value) { ?>
+                            <td>
+                                <?php 
+                                if(!empty($so_info[$data['Store']['id']]['SQ']))
+								{
+									if(array_key_exists($value['Product']['id'], $so_info[$data['Store']['id']]['SQ']))
+									{
+										echo $so_info[$data['Store']['id']]['SQ'][$value['Product']['id']];
+									}
+									else 
+									{
+										echo '0.00';
+									}
+								}
+                                else 
+								{
+                                    echo '0.00';
+                                }
+                            ?>
+                            </td>
+                            <?php 
+                        } 
+                        ?>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left">Bonus</td>
+                        <?php
+                        foreach ($products as $value) {
+                            ?>
+                            <td>
+                            <?php 
+                                if(!empty($so_info[$data['Store']['id']]['BQ']))
+								{
+									if(array_key_exists($value['Product']['id'], $so_info[$data['Store']['id']]['BQ']))
+									{
+										echo $so_info[$data['Store']['id']]['BQ'][$value['Product']['id']];
+									}
+									else 
+									{
+										echo '0.00';
+									}
+                            	}
+                                else 
+								{
+                                    echo '0.00';
+                                }
+                            ?>
+                            </td>
+                            <?php 
+                        } 
+                        ?>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left">Returned</td>
+                        <?php
+                        foreach ($products as $value) {
+                            ?>
+                            <td>
+                                <?php 
+                                if(!empty($so_info[$data['Store']['id']]['RQ']))
+								{
+                                	if(array_key_exists($value['Product']['id'], $so_info[$data['Store']['id']]['RQ'])){
+                                		echo $so_info[$data['Store']['id']]['RQ'][$value['Product']['id']];
+                               	 	}
+									else 
+									{
+										echo '0.00';
+									}
+								}
+								else 
+								{
+                                    echo '0.00';
+                                }
+                            ?>
+                            </td>
+                            <?php 
+                        } 
+                        ?>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left">Closing</td>
+                        <?php
+                        foreach ($products as $value) {
+                            ?>
+                            <td>
+                            <?php 
+							if(!empty($so_info[$data['Store']['id']]['CB']))
+							{
+								if(array_key_exists($value['Product']['id'], $so_info[$data['Store']['id']]['CB']))
+								{
+									echo $so_info[$data['Store']['id']]['CB'][$value['Product']['id']];
+								}
+								
+								
+								/*if(array_key_exists($value['Product']['id'], $so_info[$data['Store']['id']]['OB']))
+								{
+									echo $so_info[$data['Store']['id']]['OB'][$value['Product']['id']];
+								}*/
+								
+							}
+							
+							
+							
+                            ?>
+                            </td>
+                            <?php 
+                        } 
+                        ?>
+                    </tr>
+                    
+                <?php  $i++;} //break; } ?>
+                
+                </tbody>
+                
+            </table>
+            <div style="width:100%;padding-top:100px;">
+                <footer style="width:100%;text-align:center;">
+            "This Report has been generated from SMC Automated Sales System at <?php echo h($offices[$this->request->data['search']['office_id']]); ?> Area. This information is confidential and for internal use only."
+        </footer>	  
+            </div>
+            
+            <?php } ?>
+        </div>
+    </div>
+    </div>	
+    </div>			
+    </div>
+    </div>
+
+</div>
+
+
+<script>
+    function PrintElem(elem)
+    {
+        var mywindow = window.open('', 'PRINT', 'height=600,width=960');
+
+        mywindow.document.write('<html><head><title></title><?php echo $this->Html->css('bootstrap.min.css');
+echo $this->fetch('css');?>');
+        mywindow.document.write('</head><body >');
+        //mywindow.document.write('<h1>' + document.title  + '</h1>');
+        mywindow.document.write(document.getElementById(elem).innerHTML);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close(); // necessary for IE >= 10
+        mywindow.focus(); // necessary for IE >= 10*/
+
+        mywindow.print();
+        mywindow.close();
+
+        return true;
+    }
+</script>

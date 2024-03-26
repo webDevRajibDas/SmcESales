@@ -1,0 +1,426 @@
+<?php //pr($offices);die();?>
+	<style>
+		div{
+			margin:0px;
+			padding:0px;
+			font-family: arial;
+		}
+		table, th, td {
+			//border: 1px solid black;
+			border-collapse: collapse;
+		}
+		.print-table{
+			font-size: 11px;
+		}
+		#content { display: <?php 
+			if (!empty($office_id)) {
+				echo 'block';
+			}else{
+				echo 'none';
+			}
+		?>; }
+		@media print
+			{
+				#non-printable { display: none; }
+				#content { display: block; }
+				table, th, td {
+					border: 1px solid black;
+					border-collapse: collapse;
+				}
+				footer {
+				    position: fixed;
+				    bottom: 0;
+				}
+				img{
+				  	height: 55px;
+				  	width: 35px;
+				}
+			}
+    </style>
+<div class="row">
+    <div class="col-xs-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<h3 class="box-title"><i class="glyphicon glyphicon-th-large"></i> <?php echo __('Deposit Report'); ?></h3>
+				<div class="box-tools pull-right">
+					<?php //if($this->App->menu_permission('deposits','admin_add')){ echo $this->Html->link(__('<i class="glyphicon glyphicon-plus"></i> New Deposit'), array('action' => 'add'), array('class' => 'btn btn-primary', 'escape' => false)); } ?>
+				</div>
+			</div>	
+			<div class="box-body">
+                <div class="search-box">
+					<?php echo $this->Form->create(array('role' => 'form')); ?>
+					<table class="search">
+						<tr>
+							<td width="50%"><?php echo $this->Form->input('office_id', array('name'=>'office_id', 'id' => 'office_id','class' => 'form-control office_id','required'=>true,'empty'=>'---- Select Office ----')); ?></td>
+							<td width="50%"><?php echo $this->Form->input('date_from', array('name'=>'date_from', 'class' => 'date_from form-control datepicker','id'=>'date_from','required'=>true)); ?></td>
+						</tr>
+						<tr>
+							<td width="50%"><input type="hidden" id="date_to_hidden"></td>
+							<td width="33%"><?php echo $this->Form->input('date_to', array('class' => 'date_to form-control datepicker','id'=>'date_to','required'=>true, 'name'=>'date_to')); ?></td>
+						</tr>			
+						<tr align="center">
+							<td colspan="3">
+								<?php echo $this->Form->button('<i class="fa fa-search"></i> Search', array('type' => 'submit','class' => 'btn btn-large btn-primary','escape' => false)); ?>
+								<?php echo $this->Html->link(__('<i class="fa fa-refresh"></i> Reset'), array('action' => ''), array('class' => 'btn btn-warning', 'escape' => false)); ?>
+
+								<?php
+									if (!empty($office_id)) {
+									?>
+										<button onclick="PrintElem('content')" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+									<?php
+									}
+								?>
+							</td>						
+						</tr>
+					</table>	
+					<?php echo $this->Form->end(); ?>
+				</div>
+
+				<div class='row'>
+					<div class='col-xs-6'>
+						<div id='Users_info' class='dataTables_info'>
+						<?php	//echo $this->Paginator->counter(array("format" => __("Page {:page} of {:pages}, showing {:current} records out of {:count} total"))); ?>	
+						</div>
+					</div>
+					<div class='col-xs-6'>
+						<div class='dataTables_paginate paging_bootstrap'>
+							<ul class='pagination'>									
+								<?php
+									//echo $this->Paginator->prev(__("prev"), array("tag" => "li"), null, array("tag" => "li","class" => "disabled","disabledTag" => "a"));
+									//echo $this->Paginator->numbers(array("separator" => "","currentTag" => "a", "currentClass" => "active","tag" => "li","first" => 1));
+									//echo $this->Paginator->next(__("next"), array("tag" => "li","currentClass" => "disabled"), null, array("tag" => "li","class" => "disabled","disabledTag" => "a"));
+								?>								
+							</ul>
+						</div>
+					</div>
+				</div>				
+			</div>	
+
+
+<div id="content" style="width:90%;height:100%;margin-left:5%;margin-right:5%;">
+		<!-- <div style="text-align:right;width:100%;">Page No :1 of 2</div> -->
+		
+		<div style="float: left; height: 55px; width: 35px;"><?php echo $this->Html->image('smc_new.PNG'); ?></div>
+		<br><br><br><br>
+		<div style="width:100%;text-align:center;">
+			<div style="font-size:20px;">SMC Enterprise Limited</div>
+			<div style="font-size:14px;"><strong>SALES, COLLECTION AND DEPOSITION STATEMENT</strong></div>
+			<div style="font-size:11px;">Between:&nbsp;&nbsp;<?php if(!empty($date_range_first)) echo date('d-M-Y', strtotime($date_range_first)); ?>&nbsp;to&nbsp;<?php if(!empty($date_range_last)) echo date('d-M-Y', strtotime($date_range_last)); ?>&nbsp;&nbsp;&nbsp;&nbsp;Reporting Date:&nbsp;&nbsp;<?php if(!empty($current_date)) echo date('d-M-Y', strtotime($current_date)); ?></div>
+			<div style="font-size:11px;padding-bottom:40px;">Area : <?php if(!empty($office_id)) echo $offices[$office_id]; ?></div>
+		</div>	  
+		
+
+		
+		<table class="print-table table table-bordered table-responsive" style="width:100%" border="1px solid black" cellpadding="2px" cellspacing="0">
+			  <tr>
+				<th >NAME OF SO'S</th>
+				<th colspan="3">OPENING BALANCE</th> 
+				<th colspan="3">SALES</th>
+				<th colspan="3">CREDIT COLLECTION</th>
+				<th>TOTAL COLLECTION</th>
+				<th colspan="3">DEPOSIT</th>
+				<th colspan="3">CLOSING BALANCE</th>
+				<th colspan="3">CLOSING FOLLOW-UP</th>
+			  </tr>
+			  <tr>
+				<td></td>
+				<td>IN THE HANDS OF SO</td>
+				<td>MARKET OUTSTANDING</td>
+				<td>RECEIVABLE FORM A.O/Z.O</td>
+				<td>CASH</td>
+				<td>CREDIT</td>
+				<td>TOTAL</td>
+				<td>AGAINST CUR PERIOD'S SALE</td>
+				<td>AGAINST PRE PERIOD'S SALE</td>
+				<td>TOTAL</td>
+				<td></td>
+				<td>AGAINST CUR PERIOD'S SALE</td>
+				<td>AGAINST PRE PERIOD'S SALE</td>
+				<td>TOTAL</td>
+				<td>IN HANDS OF SO</td>
+				<td>MARKET OUTSTANDING</td>
+				<td>RECEIVABLE FORM A.O/Z.O</td>
+				<td>Date of Subsequent Period</td>
+				<td>Subsequent Period Deposit</td>
+				<td>Balance</td>
+			  </tr>
+			  <tr>
+				<td></td>
+				<td align="center">[A]</td>
+				<td align="center">[B]</td>
+				<td align="center">[C=A+B]</td>
+				<td align="center">[D]</td>
+				<td align="center">[E]</td>
+				<td align="center">[F=D+E]</td>
+				<td align="center">[G]</td>
+				<td align="center">[H]</td>
+				<td align="center">[I=G+H]</td>
+				<td align="center">[J=I+D]</td>
+				<td align="center">[K1]</td>
+				<td align="center">[K2]</td>
+				<td align="center">[K=K1+K2]</td>
+				<td align="center">[L=(J-K)+A]</td>
+				<td align="center">[M=(F-J)+B]</td>
+				<td align="center">[N=L+M]</td>
+				<td align="center">[O]</td>
+				<td align="center">[P]</td>
+				<td align="center">[Q=L-P]</td>
+			  </tr>
+			  <script>var id_number = 0;</script>
+			  <?php
+			  if (!empty($sales_people)) {
+			  	$i = 0;
+			  	foreach ($sales_people as $sales_person) {
+			  		$i = $i+1;
+			  		$territory_id = $sales_person['Territory']['id'];
+			  		$sales_person_id = $sales_person['SalesPerson']['id'];
+			  		if (!empty($territory_id)) {
+			  			$hands_of_so_opening = $collection_amount[$territory_id][0][0]['total_collection']-$deposit_amount[$sales_person_id][0][0]['total_deposit'];
+			  			$market_outstanding = $sale_amount[$sales_person_id][0][0]['total_sale']-$collection_amount[$territory_id][0][0]['total_collection'];
+			  			$current_periods_credit_collection = $current_credit_collection[$territory_id][0][0]['total_current_credit_collection'];
+			  			$previous_periods_credit_collection = $previous_credit_collection[$territory_id][0][0]['total_previous_credit_collection'];
+			  		}
+			  		$sales_cash = $cash_credit_amount[$sales_person_id][0][0]['total_cash'];
+			  		$sales_credit = $cash_credit_amount[$sales_person_id][0][0]['total_credit'];	  		
+			  		$current_period_sale_deposit = $current_deposit[$sales_person_id][0][0]['total_current_deposit'];
+			  		$previous_period_sale_deposit = $previous_deposit[$sales_person_id][0][0]['total_previous_deposit'];
+			  		
+			  		//pr($sales_person);die();
+			  ?>
+			  <tr>
+				<td align="left"><?php echo $sales_person['SalesPerson']['name']; ?></td>
+				<td align="center" id="a<?php echo '_'.$i;?>">			
+					<?php
+						if(!empty($hands_of_so_opening)){
+							echo $hands_of_so_opening; 
+						}else{
+							echo 0;
+						}
+					?>					
+				</td>
+				<td align="center" id="b<?php echo '_'.$i;?>">
+					<?php
+						if (!empty($market_outstanding)) {
+							echo $market_outstanding;
+						}else{
+							echo 0;
+						}
+					?>				
+				</td>
+				<td align="center" id="c<?php echo '_'.$i;?>"><?=($hands_of_so_opening+$market_outstanding)?></td>
+				<td align="center" id="d<?php echo '_'.$i;?>">
+					<?php
+						if (!empty($sales_cash)) {
+						 	echo $sales_cash; 
+						 }else{
+						 	echo 0;
+						 }
+					?>
+				</td>
+				<td align="center" id="e<?php echo '_'.$i;?>">
+					<?php
+						if (!empty($sales_credit)) {
+						 	echo $sales_credit;
+						 }else{
+						 	echo 0;
+						 }
+					?>
+				</td>
+				<td align="center" id="f<?php echo '_'.$i;?>"></td>
+				<td align="center" id="g<?php echo '_'.$i;?>">
+					<?php
+						if (!empty($current_periods_credit_collection)) {
+							echo $current_periods_credit_collection;
+						}else{
+							echo 0;
+						}	
+					?>
+				</td>
+				<td align="center" id="h<?php echo '_'.$i;?>">
+					<?php
+						if (!empty($previous_periods_credit_collection)) {
+						 	echo $previous_periods_credit_collection;
+						 }else{
+						 	echo 0;
+						 }
+					?>
+				</td>
+				<td align="center" id="i<?php echo '_'.$i;?>"></td>
+				<td align="center" id="j<?php echo '_'.$i;?>"></td>
+				<td align="center" id="k1<?php echo '_'.$i;?>">
+					<?php
+						if (!empty($current_period_sale_deposit)) {
+						 	echo $current_period_sale_deposit;
+						 }else{
+						 	echo 0;
+						 }
+					?>
+				</td>
+				<td align="center" id="k2<?php echo '_'.$i;?>">
+					<?php
+						if (!empty($previous_period_sale_deposit)) {
+						 	echo $previous_period_sale_deposit;
+						 }else{
+						 	echo 0;
+						 }
+					?>
+				</td>
+				<td align="center" id="k<?php echo '_'.$i;?>"></td>
+				<td align="center" id="l<?php echo '_'.$i;?>"></td>
+				<td align="center" id="m<?php echo '_'.$i;?>"></td>
+				<td align="center" id="n<?php echo '_'.$i;?>"></td>
+				<td align="center" id="o<?php echo '_'.$i;?>"></td>
+				<td align="center" id="p<?php echo '_'.$i;?>"></td>
+				<td align="center" id="q<?php echo '_'.$i;?>"></td>
+			  </tr>
+			  <script>
+			  	var id_number = id_number+1;
+			  	var a = parseFloat($('#a_'+id_number).text());
+			  	var b = parseFloat($('#b_'+id_number).text());
+			  	var c = a+b;
+			  	//$('#c_'+id_number).text(c);
+
+			  	var d = parseFloat($('#d_'+id_number).text());
+			  	var e = parseFloat($('#e_'+id_number).text());
+			  	var f = d+e;
+			  	$('#f_'+id_number).text(f);
+
+			  	var g = parseFloat($('#g_'+id_number).text());
+			  	var h = parseFloat($('#h_'+id_number).text());
+			  	var i = g+h;
+			  	$('#i_'+id_number).text(i);
+
+			  	var j = i+d;
+			  	$('#j_'+id_number).text(j);
+
+			  	var k1 = parseFloat($('#k1_'+id_number).text());
+			  	var k2 = parseFloat($('#k2_'+id_number).text());
+			  	var k = k1+k2;
+			  	$('#k_'+id_number).text(k);
+
+			  	var l = (j-k)+a;
+			  	$('#l_'+id_number).text(l);
+
+			  	var m = (f-j)+b;
+			  	$('#m_'+id_number).text(m);
+
+			  	var n = l+m;
+			  	$('#n_'+id_number).text(n);
+
+			  	var o = parseFloat($('#o_'+id_number).text());
+			  	var p = parseFloat($('#p_'+id_number).text());
+			  	var q = l-p;
+			  	$('#q_'+id_number).text(q);
+			  </script>
+			  <?php
+			    //break;
+				}
+			  }
+			  ?>			  
+      </table>
+	  
+		<div style="width:100%;padding-top:100px; font-size:13px;">
+			<div style="width:33%;text-align:left;float:left">
+				Prepared by:______________ 
+			</div>
+			<div style="width:33%;text-align:center;float:left">
+				Checked by:______________ 
+			</div>
+			<div style="width:33%;text-align:right;float:left">
+				Signed by:______________
+			</div>		  
+		</div>
+		<div style="width:100%;padding-top:0px; font-size:13px;">
+			<div style="width:33%;text-align:left;float:left">
+				<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(I.T.O)</span>
+			</div>
+			<div style="width:33%;text-align:center;float:left">
+				<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(A.O)</span> 
+			</div>
+			<div style="width:33%;text-align:right;float:left">
+				<span>(S.M)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			</div>		  
+		</div><br><br><br><br><br>
+
+		<footer style="width:100%;text-align:center;">
+        "This Report has been generated from SMC Automated Sales System at [<?php if(!empty($office_id)) echo $offices[$office_id].' Area'; ?>]. This information is confidential and for internal use only."
+    	</footer>
+				
+	</div>
+
+		</div>
+	</div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+    	$('.date_from').change(function(){
+			getdate();
+		});
+
+		/*$('.date_to').change(function(){
+			var date_to_hidden = $('#date_to_hidden').val();
+			var get_date_to = $('#date_to').val();
+			//console.log(date_to_hidden);
+			//console.log(get_date_to);
+		    if(get_date_to<date_to_hidden){
+		    	alert('Minimum date range 7 days required');
+		    	$('#date_to').val('');
+		    }
+		});*/
+
+		function getdate() {
+		    var get_date_from = document.getElementById('date_from').value;
+			var datearray = get_date_from.split("-");
+			var date_from = datearray[1] + '-' + datearray[0] + '-' + datearray[2];
+
+		    var date = new Date(date_from);
+		    var newdate = new Date(date);
+		    newdate.setDate(newdate.getDate() + 6);
+		    
+		    var dd = newdate.getDate();
+		    var mm = newdate.getMonth() + 1;
+		    var y = newdate.getFullYear();
+			
+			var len = dd.toString().length;
+			if(len == 1){
+				dd = '0'+dd;
+			}
+
+		    var someFormattedDate = mm + '-' + dd + '-' + y;
+		    var datearray2 = someFormattedDate.split("-");
+			var new_date_to = datearray2[1] + '-' + datearray2[0] + '-' + datearray2[2];
+
+		    document.getElementById('date_to_hidden').value = new_date_to;
+		    
+		}
+
+        
+    });
+
+   
+</script>
+
+
+	<script>
+			function PrintElem(elem)
+					{
+						var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+
+						//mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+						mywindow.document.write('<html><head><title></title>');
+						mywindow.document.write('</head><body >');
+						//mywindow.document.write('<h1>' + document.title  + '</h1>');
+						mywindow.document.write(document.getElementById(elem).innerHTML);
+						mywindow.document.write('</body></html>');
+
+						mywindow.document.close(); // necessary for IE >= 10
+						mywindow.focus(); // necessary for IE >= 10*/
+
+						mywindow.print();
+						mywindow.close();
+
+						return true;
+					}
+	</script>

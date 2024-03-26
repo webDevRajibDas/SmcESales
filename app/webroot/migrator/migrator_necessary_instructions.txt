@@ -1,0 +1,18 @@
+-Make Sure PHP sqlsrv extensions are working fine;
+-PHP memory limit;
+-PHP max_execution_time;
+[{"LastChallanSyncDateTime":"2015-10-15 12:55:36"}, {"LastReturnSyncDateTime":"2017-09-07 14:04:07"}]
+ 
+Chalan Script:
+1st: Getting records from DSS DB ASOIssues, ASOIssueItems, SKUs, ASOIssueDeliveryRecord tables
+and Inserting records to challans, challan_details of ESALES DB
+2nd:  Getting data from view named vwSKUStock and inserting/updating to current_cwh_inventories of ESALES
+
+Return Script:
+1st: Getting records from return_challans, return_challan_details tables from Esales DB and inserting or updating to ASOReturnItem, ASOReturnItemHistory table of DSS DB
+2nd: Getting records from current_inventories from ESALES DB and inserting/updating to ASOSKUStock DSS Db
+
+
+Task Scheduler:
+powershell
+-ExecutionPolicy unrestricted -Command "(New-Object Net.WebClient).DownloadString(\"http://localhost/migrator/migration.php\")"
